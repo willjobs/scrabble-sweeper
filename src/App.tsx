@@ -440,6 +440,7 @@ function GameScreen({
             setCursor(null);
             setAnchor(null);
             setDirection("across");
+            setSelectedCell(null);
             setSelected(null);
             setSheet(null);
             setNotesMode(false);

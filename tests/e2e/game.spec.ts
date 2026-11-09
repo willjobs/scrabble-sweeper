@@ -470,6 +470,7 @@ for (const mode of ["Score-only", "Reveal-used"])
     ).toHaveAttribute("aria-pressed", "true");
     await handoff(page);
     await page.getByRole("button", { name: "Notes", exact: true }).click();
+    await expect(editor).toContainText("Tap any square to make a guess");
     await page.getByTestId("cell-113").click();
     await expect(
       editor.getByRole("button", { name: "TL", exact: true }),
