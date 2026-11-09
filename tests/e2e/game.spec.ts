@@ -322,3 +322,46 @@ test("matching seeds and fixture actions give identical totals across reveal mod
   }
   expect(totals[0]).toBe(totals[1]);
 });
+
+test("reload preserves the pending receipt until the mover explicitly passes the device", async ({
+  page,
+}) => {
+  await setup(page);
+  await opening(page);
+  await page.reload();
+  await page.getByRole("button", { name: "Resume game", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Rack / })).toHaveCount(0);
+  await page.reload();
+  await page.getByRole("button", { name: "Resume game", exact: true }).click();
+  await page
+    .getByRole("button", { name: "I’m Player 1 — Review turn result" })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Pass device", exact: true }),
+  ).toBeVisible();
+  await handoff(page);
+});
+test("storage failure export recovers the newest in-memory turn and Home reports unsaved state", async ({
+  page,
+}) => {
+  const { readFile } = await import("node:fs/promises");
+  await setup(page);
+  await page.evaluate(() => {
+    IDBObjectStore.prototype.put = function () {
+      throw new DOMException("Disk full", "QuotaExceededError");
+    };
+  });
+  await page.getByRole("button", { name: "Pass", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm pass" }).click();
+  await expect(page.getByRole("alert")).toContainText("could not save");
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export saved data" }).click();
+  const data = JSON.parse(
+    await readFile((await (await download).path())!, "utf8"),
+  );
+  expect(data.turn).toBe(2);
+  expect(data.moves.at(-1).type).toBe("PASS");
+  await page.getByRole("button", { name: "Home / New game" }).click();
+  await expect(page.getByRole("dialog")).toContainText("in memory");
+  await expect(page.getByRole("dialog")).not.toContainText("game is saved");
+});

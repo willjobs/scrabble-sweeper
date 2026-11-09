@@ -54,6 +54,7 @@ export interface Game {
   turn: number;
   scoreless: number;
   phase: "TURN" | "RESULT" | "HANDOFF" | "OVER";
+  resumeResult?: true;
   moves: Move[];
   endReason?: "RACK_OUT" | "SIX_SCORELESS";
 }

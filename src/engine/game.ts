@@ -3,7 +3,7 @@ import { next, seedNumber, shuffle } from "./random";
 import { tiles, rackValue } from "./tiles";
 import { scorePlacement, validatePlacement } from "./rules";
 import type { Action, Game, Mode, Player, Move, Tile } from "./types";
-import { DICTIONARY_ID } from "./dictionary";
+import { DICTIONARY_ID } from "./dictionary-meta";
 export function createGame(
   seed: string,
   mode: Mode,
@@ -120,11 +120,13 @@ export function passDevice(state: Game): Game {
 }
 export function startTurn(state: Game): Game {
   if (state.phase !== "HANDOFF") throw Error("No handoff is pending.");
-  return { ...state, phase: "TURN" };
+  const { resumeResult, ...game } = state;
+  return { ...game, phase: resumeResult ? "RESULT" : "TURN" };
 }
 export function resumeGate(state: Game): Game {
   if (state.phase === "OVER") return state;
-  if (state.phase === "RESULT") return passDevice(state);
+  if (state.phase === "RESULT")
+    return { ...state, phase: "HANDOFF", resumeResult: true };
   return { ...state, phase: "HANDOFF" };
 }
 export function annotate(
@@ -181,6 +183,7 @@ export interface PlayerView {
   }[];
   result?: { total: number; player: Player };
   endReason?: Game["endReason"];
+  resumeResult?: true;
 }
 export function getPlayerView(
   game: Game,
@@ -234,5 +237,6 @@ export function getPlayerView(
       ? { result: { total: last.total, player: last.player } }
       : {}),
     ...(game.endReason ? { endReason: game.endReason } : {}),
+    ...(game.resumeResult ? { resumeResult: true as const } : {}),
   };
 }

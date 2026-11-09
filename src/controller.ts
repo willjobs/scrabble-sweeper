@@ -9,7 +9,18 @@ import {
 } from "./engine/game";
 import type { PlayerView } from "./engine/game";
 import type { Action, Game, Mode, Player } from "./engine/types";
-import { dictionary } from "./engine/dictionary";
+// Keep the large word list off the startup path; failed prefetches can retry on play.
+let dictionaryLoad: Promise<ReadonlySet<string>> | null = null;
+function loadDictionary(): Promise<ReadonlySet<string>> {
+  return (dictionaryLoad ??= import("./engine/dictionary")
+    .then((m) => m.dictionary)
+    .catch(() => {
+      dictionaryLoad = null;
+      throw Error(
+        "The word list could not load. Reconnect and try submitting again.",
+      );
+    }));
+}
 import { loadGame, saveGame, exportSave } from "./storage/game-store";
 export const DEV_TOOLS =
   import.meta.env.DEV || import.meta.env.VITE_DEV_TOOLS === "1";
@@ -61,6 +72,9 @@ export const controller = {
     };
   },
   getSnapshot: () => snapshot,
+  prepareDictionary() {
+    void loadDictionary().catch(() => {});
+  },
   async initialize() {
     try {
       authoritative = await loadGame();
@@ -119,6 +133,8 @@ export const controller = {
     if (!authoritative || snapshot.busy) return false;
     emit({ busy: true, error: "" });
     try {
+      const dictionary =
+        action.type === "PLAY" ? await loadDictionary() : new Set<string>();
       const game = applyAction(authoritative, action, dictionary);
       await persist(game);
       authoritative = game;
@@ -176,7 +192,9 @@ export const controller = {
     emit({ view: null, error: "" });
   },
   async export() {
-    const text = await exportSave();
+    const text = authoritative
+      ? JSON.stringify(authoritative, null, 2)
+      : await exportSave();
     const url = URL.createObjectURL(
       new Blob([text], { type: "application/json" }),
     );

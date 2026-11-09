@@ -424,7 +424,7 @@ describe("private notes and projections N/H", () => {
     expect(getPlayerView(h, 1).rack).toEqual([]);
     expect(startTurn(h).phase).toBe("TURN");
     expect(resumeGate(a).phase).toBe("HANDOFF");
-    expect(resumeGate(b).active).toBe(1);
+    expect(resumeGate(b).active).toBe(0);
     const over = {
       ...b,
       phase: "OVER" as const,
@@ -562,4 +562,23 @@ test("rack-out with a single remaining tile ends without requiring seven tiles",
   expect(result.moves[0].total).toBe(2);
   expect(result.players.map((p) => p.score)).toEqual([12, -10]);
   expect(result.phase).toBe("OVER");
+});
+
+test("resuming a saved result keeps the mover and receipt behind an identity gate", () => {
+  const result = applyAction(
+    createGame("receipt-resume", "SCORE_ONLY"),
+    { type: "PASS" },
+    words,
+  );
+  const gate = resumeGate(result);
+  expect(gate.active).toBe(result.active);
+  expect(getPlayerView(gate, gate.active).rack).toEqual([]);
+  const restored = restoreGame(JSON.parse(JSON.stringify(gate)));
+  const receipt = startTurn(resumeGate(restored));
+  expect(receipt.phase).toBe("RESULT");
+  expect(getPlayerView(receipt, receipt.active).result?.total).toBe(
+    result.moves[0].total,
+  );
+  expect(receipt.turn).toBe(result.turn);
+  expect(passDevice(receipt).active).toBe(1);
 });

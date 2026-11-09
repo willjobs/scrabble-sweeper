@@ -15,10 +15,16 @@ export default function App() {
   const [online, setOnline] = useState(navigator.onLine);
   useEffect(() => {
     void controller.initialize();
+    let warmFrame = 0;
+    const paintFrame = requestAnimationFrame(() => {
+      warmFrame = requestAnimationFrame(() => controller.prepareDictionary());
+    });
     const update = () => setOnline(navigator.onLine);
     window.addEventListener("online", update);
     window.addEventListener("offline", update);
     return () => {
+      cancelAnimationFrame(paintFrame);
+      cancelAnimationFrame(warmFrame);
       window.removeEventListener("online", update);
       window.removeEventListener("offline", update);
     };
@@ -59,7 +65,7 @@ export default function App() {
       )}
       {!state.loading &&
         (state.view ? (
-          <GameScreen view={state.view} busy={state.busy} />
+          <GameScreen view={state.view} busy={state.busy} saved={state.saved} />
         ) : (
           <Setup hasSave={state.hasSave} busy={state.busy} />
         ))}
@@ -253,7 +259,15 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
     </section>
   );
 }
-function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
+function GameScreen({
+  view,
+  busy,
+  saved,
+}: {
+  view: PlayerView;
+  busy: boolean;
+  saved: boolean;
+}) {
   const [pending, setPending] = useState<Placement[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
@@ -354,7 +368,7 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
         </div>
         <p className="eyebrow">NEXT UP. NEW POSSIBILITIES.</p>
         <h2>
-          Your move,
+          {view.resumeResult ? "Review your turn," : "Your move,"}
           <br />
           {view.names[view.active]}
         </h2>
@@ -376,7 +390,8 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
             void controller.start();
           }}
         >
-          I’m {view.names[view.active]} — Start turn
+          I’m {view.names[view.active]} —{" "}
+          {view.resumeResult ? "Review turn result" : "Start turn"}
         </button>
       </section>
     );
@@ -831,8 +846,11 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
       {sheet === "new" && (
         <Dialog title="Return home?" onClose={closeSheet}>
           <p>
-            Your committed game is saved. Pending placements will be discarded.
-            A new game asks before replacing the save.
+            {saved
+              ? "Your committed game is saved."
+              : "Your latest game is only in memory. Closing the app may lose progress."}{" "}
+            Pending placements will be discarded. A new game asks before
+            replacing the save.
           </p>
           <button className="primary" onClick={() => controller.home()}>
             Return home

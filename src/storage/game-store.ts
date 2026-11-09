@@ -2,7 +2,7 @@ import { openDB } from "idb";
 import { z } from "zod";
 import type { Game } from "../engine/types";
 import { BONUSES } from "../engine/types";
-import { DICTIONARY_ID } from "../engine/dictionary";
+import { DICTIONARY_ID } from "../engine/dictionary-meta";
 import { INVENTORY, tiles } from "../engine/tiles";
 import { distance } from "../engine/generator";
 const tile = z.object({
@@ -45,6 +45,7 @@ const schema = z.object({
   turn: z.number().int().positive(),
   scoreless: z.number().int().min(0).max(6),
   phase: z.enum(["TURN", "RESULT", "HANDOFF", "OVER"]),
+  resumeResult: z.literal(true).optional(),
   moves: z.array(
     z.object({
       turn: z.number().int().positive(),
