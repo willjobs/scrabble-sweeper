@@ -11,6 +11,8 @@ npm ci
 npm run dev
 ```
 
+The project uses an ignored repo-local `.npm-cache/` so installation also works in workspaces with a read-only home directory.
+
 Open the printed local URL. Production: `npm run build`, then `npm run preview`. The built static site is in `dist/`. Serve over HTTPS for offline/install features; localhost also works. No deployment credentials are required for development.
 
 For a physical phone on a trusted LAN, use the host's LAN address and an HTTPS static server for `dist/` with a certificate trusted by that phone. HTTP LAN addresses do not enable service workers. Do not expose Vite development tools publicly. On iPhone Safari, open the HTTPS site, wait for the initial load/cache install, then **Share → Add to Home Screen**. iOS does not supply an automatic install prompt. Physical iPhone/Safari and Home Screen behavior are **unverified** in this environment.
