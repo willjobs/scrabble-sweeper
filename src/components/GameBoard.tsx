@@ -22,17 +22,18 @@ export function GameBoard({
 }) {
   const [enlarged, setEnlarged] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
-  const previous = useRef({ enlarged: false, cursor });
+  const focus = notesMode ? selected : cursor;
+  const previous = useRef({ enlarged: false, focus });
 
   // Keep scrolling inside the board, including the next placement at an edge.
   useLayoutEffect(() => {
     const entering = enlarged && !previous.current.enlarged;
-    const moved = cursor !== null && cursor !== previous.current.cursor;
-    previous.current = { enlarged, cursor };
+    const moved = focus !== null && focus !== previous.current.focus;
+    previous.current = { enlarged, focus };
     if (!enlarged || (!entering && !moved) || !viewport.current) return;
     const at = entering
-      ? (cursor ?? selected ?? board.findIndex((cell) => cell.fresh))
-      : cursor;
+      ? (focus ?? selected ?? board.findIndex((cell) => cell.fresh))
+      : focus;
     const target = viewport.current.querySelector<HTMLElement>(
       `[data-testid="cell-${at === null || at < 0 ? 112 : at}"]`,
     );
@@ -45,16 +46,28 @@ export function GameBoard({
       viewport.current.scrollTop +=
         square.top - frame.top - (frame.height - square.height) / 2;
     } else {
-      if (square.left < frame.left)
-        viewport.current.scrollLeft += square.left - frame.left;
-      if (square.right > frame.right)
-        viewport.current.scrollLeft += square.right - frame.right;
-      if (square.top < frame.top)
-        viewport.current.scrollTop += square.top - frame.top;
-      if (square.bottom > frame.bottom)
-        viewport.current.scrollTop += square.bottom - frame.bottom;
+      const rowLabels =
+        viewport.current.querySelector<HTMLElement>(".row-labels")!;
+      const columnLabels =
+        viewport.current.querySelector<HTMLElement>(".column-labels")!;
+      const left = frame.left + viewport.current.clientLeft;
+      const top = frame.top + viewport.current.clientTop;
+      const right = left + viewport.current.clientWidth;
+      const bottom = top + viewport.current.clientHeight;
+      // Sticky coordinates cover part of the scrollport, so keep the entire
+      // focused square clear of those labels as well as the outer edges.
+      if (square.left < left + rowLabels.offsetWidth + 1)
+        viewport.current.scrollLeft +=
+          square.left - left - rowLabels.offsetWidth - 1;
+      if (square.right > right)
+        viewport.current.scrollLeft += square.right - right;
+      if (square.top < top + columnLabels.offsetHeight + 1)
+        viewport.current.scrollTop +=
+          square.top - top - columnLabels.offsetHeight - 1;
+      if (square.bottom > bottom)
+        viewport.current.scrollTop += square.bottom - bottom;
     }
-  }, [enlarged, cursor, selected, board]);
+  }, [enlarged, focus, selected, board]);
 
   return (
     <div className={`board-wrap ${notesMode ? "notes-map" : "letter-map"}`}>

@@ -563,3 +563,28 @@ for (const width of [320, 390])
     await handoff(page);
     await expect(page.locator(".square-guess")).toHaveCount(0);
   });
+
+test("zoom follows the square selected for post-score notes", async ({
+  page,
+}) => {
+  await setup(page, "Reveal-used");
+  // A word ending at the center leaves the cursor well right of its first tile.
+  await page.getByTestId("cell-107").click();
+  for (const letter of "CATERS")
+    await page
+      .getByRole("button", { name: new RegExp(`^Rack ${letter},`) })
+      .click();
+  await page.getByRole("button", { name: /Enlarge/ }).click();
+  await expect(page.getByTestId("cell-113")).toBeInViewport();
+  await expect(page.getByTestId("cell-107")).not.toBeInViewport();
+  await page.getByRole("button", { name: "Submit word" }).click();
+  await expect(
+    page.getByRole("region", { name: "Private notes" }),
+  ).toContainText("C · 3 points");
+  await expect(page.getByTestId("cell-107")).toBeInViewport();
+  const square = (await page.getByTestId("cell-107").boundingBox())!;
+  const rows = (await page.locator(".row-labels").boundingBox())!;
+  const columns = (await page.locator(".column-labels").boundingBox())!;
+  expect(square.x).toBeGreaterThanOrEqual(rows.x + rows.width);
+  expect(square.y).toBeGreaterThanOrEqual(columns.y + columns.height);
+});
