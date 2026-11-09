@@ -5,11 +5,15 @@ export function GameBoard({
   selected,
   onSquare,
   notesMode = false,
+  cursor = null,
+  direction = "across",
 }: {
   board: (CellView & { staged?: boolean })[];
   selected: number | null;
   onSquare: (i: number) => void;
   notesMode?: boolean;
+  cursor?: number | null;
+  direction?: "across" | "down";
 }) {
   return (
     <div className="board-wrap">
@@ -31,17 +35,23 @@ export function GameBoard({
         >
           {board.map((cell, i) => {
             const highlight =
-              selected !== null && (i === selected || i === mirror(selected));
+              selected !== null &&
+              (i === selected || (notesMode && i === mirror(selected)));
             const bonus = cell.bonus;
             const tile = cell.tile;
             return (
               <button
                 key={i}
                 data-testid={`cell-${i}`}
-                aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}${cell.staged ? ", staged" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i !== 112 && cell.note !== undefined && cell.note !== 31 ? ", your note" : ""}`}
-                className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${bonus ? "bonus-" + bonus : ""}`}
+                aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}${cell.staged ? ", staged" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i === cursor ? `, placement cursor ${direction}` : ""}${i !== 112 && cell.note !== undefined && cell.note !== 31 ? ", your note" : ""}`}
+                className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${i === cursor ? "placement-cursor" : ""} ${bonus ? "bonus-" + bonus : ""}`}
                 onClick={() => onSquare(i)}
               >
+                {i === cursor && !tile && (
+                  <span className="cursor-arrow" aria-hidden="true">
+                    {direction === "across" ? "→" : "↓"}
+                  </span>
+                )}
                 {tile ? (
                   <>
                     <span
@@ -52,7 +62,7 @@ export function GameBoard({
                     </span>{" "}
                     <sub aria-hidden="true">{tile.value}</sub>
                   </>
-                ) : i === 112 ? (
+                ) : i === 112 && cursor !== i ? (
                   <span className="center">✦</span>
                 ) : bonus && bonus !== "NONE" ? (
                   <small>{bonus}</small>

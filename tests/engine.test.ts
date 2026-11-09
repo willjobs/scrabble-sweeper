@@ -582,3 +582,31 @@ test("resuming a saved result keeps the mover and receipt behind an identity gat
   expect(receipt.turn).toBe(result.turn);
   expect(passDevice(receipt).active).toBe(1);
 });
+
+test.each(["SCORE_ONLY", "REVEAL_USED"] as const)(
+  "mover can annotate after scoring in %s until explicit handoff",
+  (mode) => {
+    const initial = createGame("after-score-notes", mode);
+    const result = applyAction(initial, { type: "PASS" }, words);
+    const noted = annotate(result, 0, 113, 4);
+    expect(noted.phase).toBe("RESULT");
+    expect(noted.moves).toEqual(result.moves);
+    expect(noted.bag).toEqual(result.bag);
+    expect(noted.players.map((p) => p.score)).toEqual(
+      result.players.map((p) => p.score),
+    );
+    expect(getPlayerView(noted, 0).board[111].note).toBe(4);
+    expect(getPlayerView(noted, 0).rack).toEqual([]);
+    expect(getPlayerView(noted, 1).board[113].note).toBeUndefined();
+    expect(() => annotate(noted, 1, 0, 4)).toThrow();
+    const gate = passDevice(noted);
+    expect(getPlayerView(gate, 1).board[113].note).toBeUndefined();
+    expect(() => annotate(gate, 0, 0, 4)).toThrow();
+    expect(getPlayerView(startTurn(gate), 1).board[113].note).toBe(31);
+    const resumed = startTurn(
+      resumeGate(restoreGame(JSON.parse(JSON.stringify(noted)))),
+    );
+    expect(resumed.phase).toBe("RESULT");
+    expect(getPlayerView(resumed, 0).board[113].note).toBe(4);
+  },
+);

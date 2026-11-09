@@ -149,12 +149,12 @@ export const controller = {
   },
   async handoff() {
     if (!authoritative || snapshot.busy) return;
-    emit({ busy: true });
+    const game = passDevice(authoritative);
+    authoritative = game;
+    // Lock private notes immediately, even if saving the handoff takes time.
+    emit({ busy: true, view: getPlayerView(game, game.active), error: "" });
     try {
-      const game = passDevice(authoritative);
       await persist(game);
-      authoritative = game;
-      emit({ view: getPlayerView(game, game.active), error: "" });
     } finally {
       emit({ busy: false });
     }
@@ -187,6 +187,9 @@ export const controller = {
     return authoritative
       ? getPlayerView(authoritative, authoritative.active, turn, compare)
       : null;
+  },
+  clearError() {
+    if (snapshot.error) emit({ error: "" });
   },
   home() {
     emit({ view: null, error: "" });

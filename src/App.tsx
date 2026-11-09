@@ -6,6 +6,7 @@ import type { CellView, PlayerView } from "./engine/game";
 import { coord, mirror } from "./engine/generator";
 import { GameBoard } from "./components/GameBoard";
 import { Dialog } from "./components/Dialog";
+import { NotesDock } from "./components/NotesDock";
 
 export default function App() {
   const state = useSyncExternalStore(
@@ -224,15 +225,17 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
       <details className="how-to">
         <summary>How to play & install</summary>
         <p>
-          Start with a word crossing H8, the ordinary center. Select a rack
-          tile, then a square. All new tiles must form a connected row or
-          column. Submit to learn your turn total. Bonuses work once, on new
-          tiles only; seven tiles earn 50 extra.
+          Start with a word crossing H8, the ordinary center. Tap a starting
+          square, then tap your rack letters. The cursor advances across or
+          down. All new tiles must form a connected row or column. Submit to
+          learn your turn total. Bonuses work once, on new tiles only; seven
+          tiles earn 50 extra.
         </p>
         <p>
           Notes are your private guesses. Opposite squares match under a
           half-turn: A1 ↔ O15. Scores may allow several explanations. After each
-          turn, pass the device through the privacy screen.
+          turn, use the score and revealed squares to keep making private notes.
+          Tap another square to keep going; only Pass device ends your access.
         </p>
         <p>
           After this page has loaded and the offline cache is ready, the game
@@ -276,12 +279,38 @@ function GameScreen({
   const [historyTurn, setHistoryTurn] = useState<number | undefined>();
   const [compare, setCompare] = useState<Player | undefined>();
   const [sheet, setSheet] = useState<
-    "inspect" | "notes" | "blank" | "pass" | "exchange" | "new" | null
+    "inspect" | "blank" | "pass" | "exchange" | "new" | null
   >(null);
   const [blankAt, setBlankAt] = useState<number | null>(null);
   const [exchange, setExchange] = useState<string[] | null>(null);
   const [rackOrder, setRackOrder] = useState<string[]>([]);
   const active = view.phase === "TURN";
+  const canNote = active || view.phase === "RESULT";
+  const [cursor, setCursor] = useState<number | null>(null);
+  const [direction, setDirection] = useState<"across" | "down">("across");
+  const [anchor, setAnchor] = useState<number | null>(null);
+  const [undoStack, setUndoStack] = useState<Placement[][]>([]);
+  const changePending = (next: Placement[]) => {
+    controller.clearError();
+    setUndoStack((stack) => [...stack, pending]);
+    setPending(next);
+  };
+  const nextSquare = (
+    at: number,
+    axis: typeof direction,
+    placed: Placement[],
+  ) => {
+    for (
+      let i = at + (axis === "across" ? 1 : 15);
+      i < 225;
+      i += axis === "across" ? 1 : 15
+    ) {
+      if (axis === "across" && Math.floor(i / 15) !== Math.floor(at / 15))
+        break;
+      if (!view.board[i].tile && !placed.some((p) => p.at === i)) return i;
+    }
+    return null;
+  };
   const displayed = controller.view(historyTurn, compare) ?? view;
   const rack = rackOrder.length
     ? [...view.rack].sort(
@@ -289,36 +318,61 @@ function GameScreen({
       )
     : view.rack;
   const stage = (at: number, blankAs?: string) => {
-    if (!selected) return;
-    setPending((p) => [
-      ...p.filter((v) => v.id !== selected && v.at !== at),
+    if (!selected || busy) return;
+    const next = [
+      ...pending.filter((v) => v.id !== selected && v.at !== at),
       { id: selected, at, ...(blankAs ? { blankAs } : {}) },
-    ]);
+    ];
+    changePending(next);
     setSelected(null);
+    setAnchor(at);
+    setCursor(nextSquare(at, direction, next));
+  };
+  const placeTile = (id: string, at: number) => {
+    if (busy) return;
+    const tile = view.rack.find((t) => t.id === id);
+    if (!tile) return;
+    const assignment = pending.find((p) => p.id === id)?.blankAs;
+    if (tile.kind === "BLANK" && !assignment) {
+      setSelected(id);
+      setBlankAt(at);
+      setSheet("blank");
+      return;
+    }
+    const next = [
+      ...pending.filter((p) => p.id !== id && p.at !== at),
+      { id, at, ...(assignment ? { blankAs: assignment } : {}) },
+    ];
+    changePending(next);
+    setSelected(null);
+    setAnchor(at);
+    setCursor(nextSquare(at, direction, next));
   };
   const clickSquare = (at: number) => {
+    if (busy) return;
     setSelectedCell(at);
-    if (historyTurn !== undefined) {
+    if (historyTurn !== undefined || view.phase === "OVER") {
       setSheet("inspect");
       return;
     }
-    if (notesMode && active) {
-      setSheet("notes");
-      return;
-    }
-    if (!active || view.board[at].tile) {
-      setSheet("inspect");
+    if (notesMode && canNote) return;
+    if (view.board[at].tile || !active) {
+      setSelected(null);
+      setNotesMode(true);
       return;
     }
     if (selected) {
-      const tile = view.rack.find((t) => t.id === selected);
-      if (tile?.kind === "BLANK") {
-        setBlankAt(at);
-        setSheet("blank");
-      } else stage(at);
-    } else if (pending.some((p) => p.at === at)) {
-      setPending((p) => p.filter((v) => v.at !== at));
-    } else setSheet("inspect");
+      placeTile(selected, at);
+      return;
+    }
+    const staged = pending.find((p) => p.at === at);
+    if (staged) {
+      setSelected(staged.id);
+      setCursor(null);
+      return;
+    }
+    setCursor(at);
+    setAnchor(null);
   };
   const board: (CellView & { staged?: boolean })[] = displayed.board.map(
     (cell, i) => {
@@ -382,6 +436,10 @@ function GameScreen({
           disabled={busy}
           onClick={() => {
             setPending([]);
+            setUndoStack([]);
+            setCursor(null);
+            setAnchor(null);
+            setDirection("across");
             setSelected(null);
             setSheet(null);
             setNotesMode(false);
@@ -480,34 +538,48 @@ function GameScreen({
             +{view.result.total} <small>points</small>
           </h2>
           <p>Total: {view.scores[view.result.player]} points</p>
-          <button
-            className="primary"
-            disabled={busy}
-            onClick={() => {
-              setPending([]);
-              setSheet(null);
-              setHistoryTurn(undefined);
-              setHistory(false);
-              void controller.handoff();
-            }}
-          >
-            Pass device
-          </button>
+          <p className="result-invitation">
+            Your notes stay private until you pass.
+          </p>
+          {view.phase === "RESULT" && historyTurn === undefined && (
+            <div className="result-actions">
+              {" "}
+              <button
+                className="primary"
+                disabled={busy}
+                onClick={() => {
+                  setPending([]);
+                  setSheet(null);
+                  setHistoryTurn(undefined);
+                  setHistory(false);
+                  void controller.handoff();
+                }}
+              >
+                Pass device
+              </button>
+            </div>
+          )}
         </section>
       )}
       <nav className="toolbar" aria-label="Board tools">
         <div className="segments">
           <button
             aria-pressed={!notesMode}
-            disabled={!active || historyTurn !== undefined}
-            onClick={() => setNotesMode(false)}
+            disabled={!canNote || historyTurn !== undefined}
+            onClick={() => {
+              setNotesMode(false);
+              setSelected(null);
+            }}
           >
-            Play
+            {active ? "Play" : "Board"}
           </button>
           <button
             aria-pressed={notesMode}
-            disabled={!active || historyTurn !== undefined}
-            onClick={() => setNotesMode(true)}
+            disabled={!canNote || historyTurn !== undefined}
+            onClick={() => {
+              setNotesMode(true);
+              setSelected(null);
+            }}
           >
             Notes
           </button>
@@ -554,28 +626,89 @@ function GameScreen({
           </button>
         </div>
       )}
-      <GameBoard
-        board={board}
-        selected={selectedCell}
-        onSquare={clickSquare}
-        notesMode={notesMode}
-      />
-      <p className="board-hint">
-        {selectedCell !== null
-          ? `${coord(selectedCell)} ↔ ${coord(mirror(selectedCell))} · `
-          : ""}
-        {historyTurn !== undefined
-          ? "Read-only history"
-          : notesMode
-            ? "Tap a square to edit your private hypothesis."
-            : selected
-              ? "Tap an empty square to place your tile."
-              : "H8 is ordinary. Tap a tile, then a square."}
-      </p>
-      {active && historyTurn === undefined && (
+      <div
+        className={`board-workspace ${notesMode && canNote && historyTurn === undefined ? "with-notes" : ""}`}
+      >
+        <div className="board-column">
+          <GameBoard
+            board={board}
+            selected={
+              notesMode
+                ? selectedCell
+                : (pending.find((p) => p.id === selected)?.at ?? null)
+            }
+            onSquare={clickSquare}
+            notesMode={notesMode}
+            cursor={
+              active &&
+              !notesMode &&
+              historyTurn === undefined &&
+              exchange === null
+                ? cursor
+                : null
+            }
+            direction={direction}
+          />
+          <p className="board-hint">
+            {selectedCell !== null
+              ? `${coord(selectedCell)} ↔ ${coord(mirror(selectedCell))} · `
+              : ""}
+            {historyTurn !== undefined
+              ? "Read-only history"
+              : notesMode
+                ? "Tap squares to keep making notes. No need to close the editor."
+                : selected
+                  ? "Tap a destination to move this tile."
+                  : cursor !== null
+                    ? `${coord(cursor)} · tap your next rack letter (${direction}).`
+                    : "Tap a starting square, then tap your letters. H8 is ordinary."}
+          </p>
+        </div>
+        {canNote && notesMode && historyTurn === undefined && (
+          <NotesDock
+            at={selectedCell}
+            cell={selectedCell === null ? undefined : view.board[selectedCell]}
+            onNote={(at, mask) => void controller.note(at, mask)}
+          />
+        )}
+      </div>
+      {active && !notesMode && historyTurn === undefined && (
         <section className="rack-area" aria-label="Your rack">
           <div className="rack-heading">
-            <span>{view.names[view.active]}’s rack</span>
+            <div className="placement-tools" aria-label="Placement controls">
+              <div>
+                <button
+                  aria-pressed={direction === "across"}
+                  onClick={() => {
+                    setDirection("across");
+                    if (anchor !== null)
+                      setCursor(nextSquare(anchor, "across", pending));
+                  }}
+                >
+                  Across →
+                </button>
+                <button
+                  aria-pressed={direction === "down"}
+                  onClick={() => {
+                    setDirection("down");
+                    if (anchor !== null)
+                      setCursor(nextSquare(anchor, "down", pending));
+                  }}
+                >
+                  Down ↓
+                </button>
+              </div>
+              {selected && pending.some((p) => p.id === selected) && (
+                <button
+                  onClick={() => {
+                    changePending(pending.filter((p) => p.id !== selected));
+                    setSelected(null);
+                  }}
+                >
+                  Remove tile
+                </button>
+              )}
+            </div>
             <button
               onClick={() =>
                 setRackOrder(
@@ -610,6 +743,10 @@ function GameScreen({
                           ? ids!.filter((id) => id !== t.id)
                           : [...ids!, t.id],
                       );
+                    else if (busy) return;
+                    else if (pending.some((p) => p.id === t.id))
+                      setSelected(selected === t.id ? null : t.id);
+                    else if (cursor !== null) placeTile(t.id, cursor);
                     else setSelected(selected === t.id ? null : t.id);
                   }}
                 >
@@ -646,18 +783,40 @@ function GameScreen({
                       })
                     ) {
                       setPending([]);
+                      setUndoStack([]);
+                      setCursor(null);
+                      setAnchor(null);
                       setSelected(null);
-                      setSelectedCell(null);
-                      setNotesMode(false);
+                      setSelectedCell(
+                        pending.find((p) => p.at !== 112)?.at ??
+                          pending[0]?.at ??
+                          null,
+                      );
+                      setNotesMode(true);
                     }
                   }}
                 >
                   Submit word
                 </button>
                 <button
-                  disabled={!pending.length}
+                  disabled={!undoStack.length || busy}
                   onClick={() => {
-                    setPending([]);
+                    controller.clearError();
+                    setPending(undoStack.at(-1)!);
+                    setUndoStack((stack) => stack.slice(0, -1));
+                    setSelected(null);
+                    setCursor(null);
+                    setAnchor(null);
+                  }}
+                >
+                  Undo
+                </button>
+                <button
+                  disabled={!pending.length || busy}
+                  onClick={() => {
+                    changePending([]);
+                    setCursor(null);
+                    setAnchor(null);
                     setSelected(null);
                   }}
                 >
@@ -684,7 +843,8 @@ function GameScreen({
               {pending.length > 0 && (
                 <small>
                   Recall staged tiles before passing or exchanging. Tap a staged
-                  square to remove it, or select its rack tile to move it.
+                  tile, then its destination to move it. Undo reverses your last
+                  change.
                 </small>
               )}
             </>
@@ -731,65 +891,16 @@ function GameScreen({
                 . This is a hypothesis.
               </p>
             )}
-          {active && historyTurn === undefined && (
+          {canNote && historyTurn === undefined && (
             <button
               onClick={() => {
                 setNotesMode(true);
-                setSheet("notes");
+                setSheet(null);
               }}
             >
               Edit private note
             </button>
           )}
-        </Dialog>
-      )}
-      {sheet === "notes" && selectedCell !== null && (
-        <Dialog
-          title={`Your note · ${coord(selectedCell)} ↔ ${coord(mirror(selectedCell))}`}
-          onClose={closeSheet}
-        >
-          <p>
-            Your private guesses, mirrored to the opposite square. Pick any
-            combination; guesses are never checked.
-          </p>
-          {selectedCell === 112 ? (
-            <p>H8 is locked ordinary by rule.</p>
-          ) : (
-            <>
-              <div className="note-options">
-                {BONUSES.map((bonus, i) => {
-                  const mask = view.board[selectedCell].note ?? 31;
-                  return (
-                    <button
-                      key={bonus}
-                      aria-pressed={Boolean(mask & (1 << i))}
-                      onClick={() =>
-                        void controller.note(selectedCell, mask ^ (1 << i))
-                      }
-                    >
-                      {bonus === "NONE" ? "Ordinary" : bonus}
-                    </button>
-                  );
-                })}
-              </div>
-              {view.board[selectedCell].note === 0 && (
-                <p className="warning">
-                  Your note has no possibilities selected.
-                </p>
-              )}
-              <div className="note-reset-actions">
-                <button onClick={() => void controller.note(selectedCell, 31)}>
-                  Reset to unknown
-                </button>
-                <button onClick={() => void controller.note(selectedCell, 0)}>
-                  Clear hypothesis
-                </button>
-              </div>
-            </>
-          )}
-          <button className="primary full" onClick={closeSheet}>
-            Done
-          </button>
         </Dialog>
       )}
       {sheet === "blank" && (

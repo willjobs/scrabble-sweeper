@@ -8,7 +8,9 @@ test("board labels unknown squares without secret attributes; only callbacks han
   const game = createGame("component", "SCORE_ONLY");
   const callback = vi.fn();
   const view = getPlayerView(game, 0);
-  render(<GameBoard board={view.board} selected={0} onSquare={callback} />);
+  render(
+    <GameBoard board={view.board} selected={0} notesMode onSquare={callback} />,
+  );
   const cell = screen.getByTestId("cell-0");
   expect(cell.getAttribute("aria-label")).toBe("A1, empty");
   expect(cell.outerHTML).not.toMatch(/bonus-(?:TW|DW|TL|DL)/);
@@ -33,4 +35,17 @@ test("revealed ordinary and consumed premiums are accessible, notes distinctly l
   expect(screen.getByTestId("cell-224").getAttribute("aria-label")).toBe(
     "O15, empty, your note",
   );
+});
+
+test("a single click records one guess; multiple mode retains alternatives", async () => {
+  const { NotesDock } = await import("../src/components/NotesDock");
+  const onNote = vi.fn();
+  const cell = { tile: null, note: 31, fresh: false };
+  const { rerender } = render(<NotesDock at={0} cell={cell} onNote={onNote} />);
+  fireEvent.click(screen.getByRole("button", { name: "TL" }));
+  expect(onNote).toHaveBeenLastCalledWith(0, 4);
+  fireEvent.click(screen.getByLabelText("Multiple possibilities"));
+  rerender(<NotesDock at={0} cell={{ ...cell, note: 4 }} onNote={onNote} />);
+  fireEvent.click(screen.getByRole("button", { name: "TW" }));
+  expect(onNote).toHaveBeenLastCalledWith(0, 20);
 });

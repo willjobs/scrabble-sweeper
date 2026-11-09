@@ -137,7 +137,8 @@ export function annotate(
 ): Game {
   if (
     state.phase !== "OVER" &&
-    (state.phase !== "TURN" || state.active !== player)
+    ((state.phase !== "TURN" && state.phase !== "RESULT") ||
+      state.active !== player)
   )
     throw Error("Notes are private to your turn.");
   if (
@@ -200,7 +201,11 @@ export function getPlayerView(
       if (m.turn <= historyTurn) for (const p of m.tiles) board[p.at] = p.tile;
   const privateTurn =
     !historical && game.phase === "TURN" && viewer === game.active;
-  const notes = privateTurn
+  const privateNotes =
+    !historical &&
+    (game.phase === "TURN" || game.phase === "RESULT") &&
+    viewer === game.active;
+  const notes = privateNotes
     ? game.players[viewer].notes
     : game.phase === "OVER" && !historical && compareNotes !== undefined
       ? game.players[compareNotes].notes

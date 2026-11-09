@@ -13,10 +13,10 @@ async function setup(page: Page, mode = "Score-only", blank = false) {
   await expect(page.getByRole("button", { name: "Submit word" })).toBeVisible();
 }
 async function place(page: Page, letter: string, cell: number) {
+  await page.getByTestId(`cell-${cell}`).click();
   await page
     .getByRole("button", { name: new RegExp(`^Rack ${letter},`) })
     .click();
-  await page.getByTestId(`cell-${cell}`).click();
 }
 async function opening(page: Page) {
   await place(page, "A", 112);
@@ -44,6 +44,7 @@ test("phone workflow: invalid placement, recall, result, private handoff, reload
     page.getByRole("button", { name: "Pass device", exact: true }),
   ).toHaveCount(0);
   await page.getByRole("button", { name: "Recall", exact: true }).click();
+  await expect(page.getByRole("alert")).toHaveCount(0);
   await opening(page);
   await expect(page.getByTestId("cell-113")).not.toHaveAttribute(
     "aria-label",
@@ -92,22 +93,21 @@ test("notes mirror, allow contradictions, preserve staging and stay private", as
   await place(page, "A", 112);
   await page.getByRole("button", { name: "Notes", exact: true }).click();
   await page.getByTestId("cell-0").click();
-  const dialog = page.getByRole("dialog");
+  const editor = page.getByRole("region", { name: "Private notes" });
   await page.screenshot({ path: "test-results/notes.png", fullPage: true });
-  for (const name of ["Ordinary", "DL", "DW"])
-    await dialog.getByRole("button", { name, exact: true }).click();
-  await dialog.getByRole("button", { name: "Done" }).click();
+  await editor.getByLabel("Multiple possibilities").check();
+  await editor.getByRole("button", { name: "TL", exact: true }).click();
+  await editor.getByRole("button", { name: "TW", exact: true }).click();
   await expect(page.getByTestId("cell-224")).toHaveAttribute(
     "aria-label",
     /your note/,
   );
   await page.getByTestId("cell-224").click();
   await expect(
-    dialog.getByRole("button", { name: "TL", exact: true }),
+    editor.getByRole("button", { name: "TL", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await dialog.getByRole("button", { name: "Clear hypothesis" }).click();
-  await expect(dialog).toContainText("no possibilities");
-  await dialog.getByRole("button", { name: "Done" }).click();
+  await editor.getByRole("button", { name: "Clear hypothesis" }).click();
+  await expect(editor).toContainText("No possibilities");
   await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect(page.getByTestId("cell-112")).toHaveAttribute(
     "aria-label",
@@ -390,11 +390,12 @@ test("320px blank picker, note labels and long-name handoff fit their controls",
   await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
   await page.getByRole("button", { name: "Notes", exact: true }).click();
   await page.getByTestId("cell-0").click();
-  const fitsText = await dialog
+  const fitsText = await page
+    .getByRole("region", { name: "Private notes" })
     .getByRole("button", { name: "Ordinary", exact: true })
     .evaluate((el) => el.scrollWidth <= el.clientWidth);
   expect(fitsText).toBe(true);
-  await dialog.getByRole("button", { name: "Done", exact: true }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByRole("button", { name: "Pass", exact: true }).click();
   await page.getByRole("button", { name: "Confirm pass" }).click();
   await page.getByRole("button", { name: "Pass device", exact: true }).click();
@@ -405,3 +406,93 @@ test("320px blank picker, note labels and long-name handoff fit their controls",
     true,
   );
 });
+
+for (const mode of ["Score-only", "Reveal-used"])
+  test(`fluid placement and post-score note-taking stay private: ${mode}`, async ({
+    page,
+  }) => {
+    await setup(page, mode);
+    await page.getByTestId("cell-112").click();
+    await page.getByRole("button", { name: /^Rack A,/ }).click();
+    await expect(page.getByTestId("cell-113")).toHaveAttribute(
+      "aria-label",
+      /placement cursor across/,
+    );
+    await page.getByRole("button", { name: "Down ↓", exact: true }).click();
+    await page.getByRole("button", { name: /^Rack T,/ }).click();
+    await expect(page.getByTestId("cell-127")).toHaveAttribute(
+      "aria-label",
+      /letter T/,
+    );
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await expect(page.getByTestId("cell-127")).toHaveAttribute(
+      "aria-label",
+      /empty/,
+    );
+    await page.getByRole("button", { name: "Recall", exact: true }).click();
+    await page.getByRole("button", { name: "Across →", exact: true }).click();
+    await page.getByTestId("cell-112").click();
+    await page.getByRole("button", { name: /^Rack A,/ }).click();
+    await page.getByRole("button", { name: /^Rack T,/ }).click();
+    await page.getByRole("button", { name: "Submit word" }).click();
+    const editor = page.getByRole("region", { name: "Private notes" });
+    await expect(editor).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Rack / })).toHaveCount(0);
+    await expect(editor).toContainText(
+      mode === "Reveal-used" ? "Observed:" : "Bonus hidden",
+    );
+    await editor.getByRole("button", { name: "TL", exact: true }).click();
+    await expect(page.getByTestId("cell-111")).toHaveAttribute(
+      "aria-label",
+      /your note/,
+    );
+    await page.getByTestId("cell-0").click();
+    await editor.getByRole("button", { name: "TW", exact: true }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByTestId("cell-224")).toHaveAttribute(
+      "aria-label",
+      /your note/,
+    );
+    await expect(
+      page.getByText("Saved on this device", { exact: true }),
+    ).toBeVisible();
+    await page.reload();
+    await page
+      .getByRole("button", { name: "Resume game", exact: true })
+      .click();
+    await page
+      .getByRole("button", { name: "I’m Player 1 — Review turn result" })
+      .click();
+    await page.getByRole("button", { name: "Notes", exact: true }).click();
+    await page.getByTestId("cell-113").click();
+    await expect(
+      editor.getByRole("button", { name: "TL", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await handoff(page);
+    await page.getByRole("button", { name: "Notes", exact: true }).click();
+    await page.getByTestId("cell-113").click();
+    await expect(
+      editor.getByRole("button", { name: "TL", exact: true }),
+    ).toHaveAttribute("aria-pressed", "false");
+    await page.getByRole("button", { name: "Play", exact: true }).click();
+    await page.getByRole("button", { name: "Pass", exact: true }).click();
+    await page.getByRole("button", { name: "Confirm pass" }).click();
+    await handoff(page, "Player 1");
+    await page.getByTestId("cell-111").click();
+    await page
+      .getByRole("button", { name: /^Rack C,/ })
+      .first()
+      .click();
+    await expect(page.getByTestId("cell-114")).toHaveAttribute(
+      "aria-label",
+      /placement cursor across/,
+    );
+    await page
+      .getByRole("button", { name: /^Rack S,/ })
+      .first()
+      .click();
+    await page.getByRole("button", { name: "Submit word" }).click();
+    await expect(
+      page.getByRole("button", { name: "Pass device", exact: true }),
+    ).toBeVisible();
+  });

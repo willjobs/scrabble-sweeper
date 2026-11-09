@@ -20,10 +20,10 @@ For a physical phone on a trusted LAN, use the host's LAN address and an HTTPS s
 ## Play
 
 1. Choose names and Score-only or Reveal-used. A new game confirms before replacing a saved game.
-2. Tap a rack tile, then a board square. First word covers ordinary H8. All new tiles share a row/column and connect to the crossword. Tap a staged square to remove it; select its rack tile to move it. Recall returns all staged tile identities. A blank opens an A–Z picker.
+2. Tap a starting square, then tap rack letters: the cursor advances automatically. Choose Across/Down to change direction. Tile-first placement also works. First word covers ordinary H8. All new tiles share a row/column and connect to the crossword. Tap a staged tile, then its destination to move it; Remove tile takes it back. Undo reverses the last staging change; Recall takes back the whole pending word. A blank opens an A–Z picker.
 3. Submit validates every word. Only the committed turn total is shown. Letter/word bonuses apply to newly placed tiles only; seven tiles add 50. No preview scores are supplied.
-4. Read the score receipt, tap **Pass device**, physically hand over, then the next player acknowledges their identity. Their private rack and notes do not mount before acknowledgement.
-5. Switch to Notes, select a square, and edit any set of five possibilities. Notes mirror under a 180° rotation. Empty hypotheses are allowed. H8 is locked ordinary. Notes are guesses, never certified by the system.
+4. Read the score receipt, tap **Pass device**, physically hand over, then the next player acknowledges their identity. Their private rack and notes do not mount before acknowledgement. The mover can keep annotating after seeing the score, until Pass device is tapped; that tap immediately locks their notes.
+5. Switch to Notes and tap a square. The board-side editor stays open as you select other squares. One tap records a single guess; turn on Multiple possibilities to keep alternatives. Notes mirror under a 180° rotation. Empty hypotheses are allowed. H8 is locked ordinary. Notes are guesses, never certified by the system.
 6. History reconstructs each selected turn, highlighting its new tiles and revealing only discoveries available then. Return to live board preserves staging.
 7. Six scoreless turns, or emptying a rack with an empty bag, ends the game. Final rack deductions/transfer occur once. The full layout is revealed automatically; compare either player's notes using the selector and square inspection.
 

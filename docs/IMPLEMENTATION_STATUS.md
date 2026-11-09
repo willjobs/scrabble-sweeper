@@ -10,8 +10,8 @@ The playable MVP is implemented locally in the supplied repository. Physical iPh
 | Pass/exchange, scoreless streak, rack-out, negative finals/ties | Implemented; engine fixtures and full six-scoreless-turn browser completion                                                                                                       |
 | Symmetric balanced seeded layout                                | Implemented; 1,000 seeds tested; independent layout/bag streams; bounded candidate search; 20 sample boards and descriptive statistics                                            |
 | Score-only and reveal-used                                      | Implemented; whitelisted projections; mode comparison test; no provisional/per-word score fields                                                                                  |
-| Private mirrored notes, contradictions, center lock             | Implemented; multi-toggle dialog, immediate saves, pair highlighting, two-player separation, endgame comparison/inspection                                                        |
-| Receipt → explicit handoff → acknowledged next player           | Implemented; next rack/notes absent from result and gate DOM                                                                                                                      |
+| Private mirrored notes, contradictions, center lock             | Implemented; persistent board-side editor, single/multiple guesses, immediate saves, pair highlighting, two-player separation, endgame comparison/inspection                      |
+| Receipt → explicit handoff → acknowledged next player           | Implemented; mover can annotate after scoring; next player’s rack/notes remain absent; handoff locks notes immediately                                                            |
 | Historical reconstruction and discoveries                       | Implemented; read-only selected-turn board, new-tile highlighting, no private rack/notes or future discovery; staging survives history                                            |
 | Responsive portrait interaction and accessibility               | Implemented; 320/390px layout checks, 44px rack height, semantic labels, focus/dialog keyboard support; axe scan covers setup/live/notes                                          |
 | Offline PWA and persistence                                     | Implemented; precached dictionary/assets, manifest/icons, IndexedDB transactions, safe resume gate, failure warnings/export; offline reload then dictionary-validated move tested |
@@ -49,7 +49,7 @@ Tests group related requirements instead of creating a file per ID. This table d
 
 Toolchain existed before feature work. The repo pre-commit hook runs `npm run check`: ESLint → strict TypeScript → all Vitest tests → all Playwright tests (including a production-style PWA build with fixture tools explicitly enabled). No hook bypasses.
 
-Current unit/component suite: **49 tests** in four files, including the 1,000-seed generator run. Browser suite: **16 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
+Current unit/component suite: **53 tests** in five files, including the 1,000-seed generator run. Browser suite: **18 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
 
 ## Screenshots
 
@@ -60,3 +60,5 @@ Chromium, portrait 390px: [New game](screenshots/new-game.png), [gameplay](scree
 The offline local client is inspectable with developer tools/IndexedDB and is not anti-cheat secure. The Letterpress word list differs from official tournament lists. No cross-device synchronization, old-save migrations, multiple-tab coordination or storage-eviction protection. Physical Safari, Android and non-Chromium desktop behavior are unverified. Soft generator balance is heuristic and needs playtest evidence. The app does not automatically solve or verify hypotheses. No locked game mechanics were intentionally changed.
 
 The follow-up code review and fixes are recorded in [CODE_REVIEW.md](CODE_REVIEW.md). Independent exploratory Playwright testing and screenshot review are recorded under `docs/playtest/`.
+
+The current turn interaction model and screenshots are documented in [turn-flow/README.md](turn-flow/README.md). Earlier screenshot sets show the previous modal Notes workflow.
