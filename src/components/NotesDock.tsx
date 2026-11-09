@@ -28,13 +28,30 @@ export function NotesDock({
         <p>Tap any square to make a guess. Tap another to keep going.</p>
       ) : (
         <>
-          <p className="observation">
-            {cell?.bonus
-              ? `Observed: ${cell.bonus === "NONE" ? "Ordinary" : cell.bonus} · already used`
-              : at === 112
-                ? "Ordinary center, by rule."
-                : "Bonus hidden · your guesses are not checked."}
-          </p>
+          <div className="square-readout">
+            {cell?.tile && (
+              <div className="readout-tile" aria-hidden="true">
+                <span className={cell.tile.blank ? "blank-letter" : ""}>
+                  {cell.tile.letter}
+                </span>
+                <sup>{cell.tile.value}</sup>
+              </div>
+            )}
+            <div>
+              <strong>
+                {cell?.tile
+                  ? `${cell.tile.letter} · ${cell.tile.value} ${cell.tile.value === 1 ? "point" : "points"}${cell.tile.blank ? " · blank" : ""}`
+                  : "Empty square"}
+              </strong>
+              <p className="observation">
+                {cell?.bonus
+                  ? `Observed: ${cell.bonus === "NONE" ? "Ordinary" : cell.bonus}${cell.tile ? " · already used" : ""}`
+                  : at === 112
+                    ? "Ordinary center, by rule."
+                    : "Bonus hidden · your guesses are not checked."}
+              </p>
+            </div>
+          </div>
           {at === 112 ? (
             <p>The center is always ordinary.</p>
           ) : (

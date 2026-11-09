@@ -497,3 +497,69 @@ for (const mode of ["Score-only", "Reveal-used"])
       page.getByRole("button", { name: "Pass device", exact: true }),
     ).toBeVisible();
   });
+
+for (const width of [320, 390])
+  test(`readable letters, guesses and a contained enlarged board at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await setup(page, "Reveal-used");
+    await place(page, "A", 112);
+    await page.getByRole("button", { name: /^Rack T,/ }).click();
+    const tile = page.getByTestId("cell-113");
+    expect(
+      await tile
+        .locator(".tile-letter")
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeGreaterThanOrEqual(14);
+    expect(
+      await tile
+        .locator(".tile-points")
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeGreaterThanOrEqual(8);
+    await page.getByRole("button", { name: /Enlarge/ }).click();
+    expect((await tile.boundingBox())!.width).toBeGreaterThanOrEqual(44);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    expect(
+      await tile
+        .locator(".tile-points")
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
+    ).toBeGreaterThanOrEqual(16);
+    await expect(page.getByTestId("cell-114")).toBeInViewport();
+    // Next-square navigation pans the board, while the document stays phone-wide.
+    await page.getByTestId("cell-118").click();
+    await page.getByRole("button", { name: /^Rack C,/ }).click();
+    await expect(page.getByTestId("cell-119")).toHaveAttribute(
+      "aria-label",
+      /placement cursor/,
+    );
+    await expect(page.getByTestId("cell-119")).toBeInViewport();
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
+    await page.getByRole("button", { name: "Submit word" }).click();
+    const editor = page.getByRole("region", { name: "Private notes" });
+    await expect(editor).toContainText("T · 1 point");
+    await editor.getByRole("button", { name: "TL", exact: true }).click();
+    await expect(tile.locator(".square-guess")).toHaveText("TL");
+    await expect(tile).toHaveAttribute("aria-label", /consumed, your note: TL/);
+    await editor.getByLabel("Multiple possibilities").check();
+    await editor.getByRole("button", { name: "TW", exact: true }).click();
+    await expect(tile.locator(".guess-alternatives")).toBeVisible();
+    await expect(tile.locator(".guess-alternatives")).toHaveText("TLTW");
+    const mirror = page.getByTestId("cell-111");
+    await expect(mirror).toHaveAttribute("aria-label", /your note: TL or TW/);
+    await expect(mirror).not.toHaveAttribute("aria-label", /consumed|revealed/);
+    await page.getByRole("button", { name: "Fit board", exact: true }).click();
+    await expect(tile.locator(".guess-count")).toHaveText("2?");
+    await expect(tile.locator(".guess-alternatives")).toBeHidden();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await handoff(page);
+    await expect(page.locator(".square-guess")).toHaveCount(0);
+  });

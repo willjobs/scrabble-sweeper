@@ -668,7 +668,7 @@ function GameScreen({
         {canNote && notesMode && historyTurn === undefined && (
           <NotesDock
             at={selectedCell}
-            cell={selectedCell === null ? undefined : view.board[selectedCell]}
+            cell={selectedCell === null ? undefined : board[selectedCell]}
             onNote={(at, mask) => void controller.note(at, mask)}
           />
         )}

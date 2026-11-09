@@ -33,8 +33,47 @@ test("revealed ordinary and consumed premiums are accessible, notes distinctly l
     "letter A, 0 points, blank, ordinary, consumed, your note",
   );
   expect(screen.getByTestId("cell-224").getAttribute("aria-label")).toBe(
-    "O15, empty, your note",
+    "O15, empty, your note: no possibilities",
   );
+});
+
+test("notes show actual hypotheses and keep contradictory guesses distinct from observations", () => {
+  const view = getPlayerView(createGame("legibility", "SCORE_ONLY"), 0);
+  view.board[0] = {
+    tile: { letter: "Z", value: 10, blank: false },
+    bonus: "DL",
+    note: 16,
+    fresh: true,
+  };
+  view.board[1] = { tile: null, note: 12, fresh: false };
+  const { rerender } = render(
+    <GameBoard
+      board={view.board}
+      selected={null}
+      notesMode
+      onSquare={() => {}}
+    />,
+  );
+  expect(screen.getByTestId("cell-0").textContent).toBe("TW");
+  expect(screen.getByTestId("cell-0").className).toContain("has-guess");
+  expect(screen.getByTestId("cell-0").getAttribute("aria-label")).toContain(
+    "DL, consumed, your note: TW",
+  );
+  expect(screen.getByTestId("cell-1").getAttribute("aria-label")).toContain(
+    "your note: TL or DW",
+  );
+  rerender(
+    <GameBoard board={view.board} selected={null} onSquare={() => {}} />,
+  );
+  expect(
+    screen.getByTestId("cell-0").querySelector(".tile-letter")?.textContent,
+  ).toBe("Z");
+  expect(
+    screen.getByTestId("cell-0").querySelector(".tile-points")?.textContent,
+  ).toBe("10");
+  expect(
+    screen.getByTestId("cell-0").querySelector(".square-guess"),
+  ).toBeNull();
 });
 
 test("a single click records one guess; multiple mode retains alternatives", async () => {
