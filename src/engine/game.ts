@@ -15,14 +15,12 @@ export function createGame(
     rng = s;
     return n;
   });
-  const players = names
-    .slice(0, 2)
-    .map((name, i) => ({
-      name: name.trim().slice(0, 32) || `Player ${i + 1}`,
-      rack: bag.splice(0, 7),
-      score: 0,
-      notes: {},
-    }));
+  const players = names.slice(0, 2).map((name, i) => ({
+    name: name.trim().slice(0, 32) || `Player ${i + 1}`,
+    rack: bag.splice(0, 7),
+    score: 0,
+    notes: {},
+  }));
   return {
     schema: 1,
     config: {

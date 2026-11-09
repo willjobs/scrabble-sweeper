@@ -47,7 +47,7 @@ git config core.hooksPath .githooks
 
 The pre-commit hook runs **lint, strict type checks, all unit/component tests, and all browser tests**. The browser test command builds the app first. No skipped/focused tests or hook bypasses are used.
 
-Playwright uses installed `/usr/bin/chromium` by default here. Else set `CHROMIUM_PATH` to a Chromium executable (or adapt the launch config to Playwright's downloaded browser). The CDN download was denied by this environment's network policy, so tests used system Chromium. Browser tests build with `VITE_DEV_TOOLS=1` to expose reproducible seed/rack fixtures. **Normal `npm run build` omits these controls**. Development builds also expose them. Do not distribute fixture-enabled builds for normal play.
+Playwright uses installed `/usr/bin/chromium` by default here. Else set `CHROMIUM_PATH` to a Chromium executable, or run `npx playwright install chromium` to use the downloaded browser automatically. The CDN download was denied by this environment's network policy, so tests used system Chromium. Browser tests build with `VITE_DEV_TOOLS=1` to expose reproducible seed/rack fixtures. **Normal `npm run build` omits these controls**. Development builds also expose them. Do not distribute fixture-enabled builds for normal play.
 
 ## Architecture and limitations
 
