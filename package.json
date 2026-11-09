@@ -16,9 +16,10 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "boards:inspect": "tsx scripts/inspect-boards.ts",
-    "check": "npm run lint && npm run typecheck && npm test && npm run test:e2e",
+    "check": "npm run lint && npm run typecheck && npm test && npm run test:e2e && npm run test:pages",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:pages": "playwright test --config playwright.pages.config.ts"
   },
   "dependencies": {
     "idb": "^8.0.4",

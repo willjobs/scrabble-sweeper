@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+const base = process.env.BASE_PATH || "/";
 export default defineConfig({
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -13,11 +15,11 @@ export default defineConfig({
         theme_color: "#123d36",
         background_color: "#f6f2e8",
         display: "standalone",
-        start_url: "/",
-        scope: "/",
+        start_url: base,
+        scope: base,
         icons: [
-          { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
-          { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+          { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
         ],
       },
       workbox: {

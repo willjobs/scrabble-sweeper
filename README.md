@@ -62,3 +62,9 @@ Playwright uses installed `/usr/bin/chromium` by default here. Else set `CHROMIU
 UI privacy is **not anti-cheat security**. The full layout, both racks and notes exist in local memory/IndexedDB; device owners can inspect them with developer tools. There are no cryptographic secrecy claims. Storage failures allow continued in-memory play with an explicit unsaved warning. Browser eviction of site storage can remove saves/offline assets. No cross-device sync or multiple-tab coordination is provided.
 
 Engine coverage and test mapping, platform limitations, screenshot evidence and playtest instructions are in [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md). Original supplied engineering brief is treated as a product specification, not authorization for unrelated external actions. This task uses the provided repository; no new remote repository, deployment or PR was created.
+
+## GitHub Pages
+
+Pushes to `main` run `.github/workflows/pages.yml`: format/lint/typecheck/unit/browser checks, production build at `/scrabble-sweeper/`, then deployment through GitHub Pages. Developer fixtures are disabled in the published build. The site URL is `https://willjobs.github.io/scrabble-sweeper/` once the workflow succeeds. Before the first deployment, choose **GitHub Actions** in Settings → Pages → Build and deployment → Source and run the workflow. GitHub requires an owner/admin to enable Pages; the default workflow token cannot do this initial setup. A private repository needs a GitHub plan that supports Pages for private repositories.
+
+For a local production build matching Pages, run `BASE_PATH=/scrabble-sweeper/ npm run build` and `BASE_PATH=/scrabble-sweeper/ npm run preview`, then open `/scrabble-sweeper/`. The manifest, icons, assets, service worker and installation scope follow this base path. Default local builds continue to use `/`.
