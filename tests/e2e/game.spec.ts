@@ -195,7 +195,7 @@ test("offline cache includes dictionary, saves and resumes after offline reload"
     page.getByText("Saved on this device", { exact: false }),
   ).toBeVisible();
 });
-test("320px and 390px boards fit without horizontal scrolling", async ({
+test("Phone boards fit and desktop keeps rack and Submit in view", async ({
   page,
 }) => {
   await setup(page);
@@ -219,6 +219,15 @@ test("320px and 390px boards fit without horizontal scrolling", async ({
     path: "test-results/phone-game.png",
     fullPage: true,
   });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const submit = await page
+    .getByRole("button", { name: "Submit word" })
+    .boundingBox();
+  expect(submit!.y + submit!.height).toBeLessThanOrEqual(900);
+  const rack = await page
+    .getByRole("region", { name: "Your rack" })
+    .boundingBox();
+  expect(rack!.y).toBeLessThan(submit!.y);
 });
 test("storage failures warn without claiming the move was saved", async ({
   page,

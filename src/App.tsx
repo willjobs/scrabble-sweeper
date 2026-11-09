@@ -24,14 +24,14 @@ export default function App() {
     };
   }, []);
   return (
-    <main className={state.view ? "playing" : ""}>
+    <main className={state.view ? "playing" : "home"}>
       <header className="masthead">
         <div className="brand-mark" aria-hidden="true">
-          V<span>W</span>
+          V<span>?</span>
         </div>
         <div>
           <h1>Veiled Words</h1>
-          <p>Words in plain sight. Bonuses in hiding.</p>
+          <p>The word game with a secret.</p>
         </div>
       </header>
       <div className="save-status" role="status">
@@ -63,7 +63,11 @@ export default function App() {
         ) : (
           <Setup hasSave={state.hasSave} busy={state.busy} />
         ))}
-      <footer>15 × 15 · Rotational symmetry · No score previews</footer>
+      <footer>
+        {state.view
+          ? "Make a word. Find your edge."
+          : "Two players. One device. Endless plot twists."}
+      </footer>
     </main>
   );
 }
@@ -75,17 +79,50 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
   const [confirm, setConfirm] = useState(false);
   const begin = () => void controller.newGame(names, mode, seed, fixture);
   return (
-    <section className="setup panel">
-      <p className="eyebrow">A WORD GAME WITH A SECRET</p>
-      <h2>
-        Find your next
-        <br />
-        <em>hidden advantage.</em>
-      </h2>
-      <p>
-        Build connected words. Read the scores. Use symmetry to make your own
-        deductions.
-      </p>
+    <section className="setup">
+      <div className="game-cover">
+        <div className="cover-label">
+          <span aria-hidden="true">✦</span> A LITTLE WORDPLAY. A BIG TWIST.
+        </div>
+        <h2>
+          Good words.
+          <br />
+          <em>Sneaky bonuses.</em>
+        </h2>
+        <div className="cover-art" aria-hidden="true">
+          <span className="orbit-spark spark-one">✦</span>
+          <div className="cover-board">
+            {Array.from({ length: 30 }, (_, i) => {
+              const letters: Record<number, string> = {
+                7: "P",
+                8: "L",
+                9: "A",
+                10: "Y",
+                16: "E",
+                22: "S",
+              };
+              return (
+                <span
+                  key={i}
+                  className={
+                    letters[i] ? "cover-tile" : i === 19 ? "cover-secret" : ""
+                  }
+                >
+                  {letters[i] ?? (i === 19 ? "?" : "")}
+                </span>
+              );
+            })}
+          </div>
+          <span className="floating-secret">?</span>
+          <span className="orbit-spark spark-two">✦</span>
+          <span className="art-sticker">Expect the unexpected.</span>
+        </div>
+        <p>
+          Play your words. Uncover hidden bonuses.
+          <br />
+          Keep your next move a little mysterious.
+        </p>
+      </div>
       {hasSave && (
         <button
           className="primary full"
@@ -95,22 +132,8 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           Resume game
         </button>
       )}
-      <div className="name-fields">
-        {names.map((n, i) => (
-          <label key={i}>
-            Player {i + 1}
-            <input
-              maxLength={32}
-              value={n}
-              onChange={(e) =>
-                setNames(names.map((v, j) => (j === i ? e.target.value : v)))
-              }
-            />
-          </label>
-        ))}
-      </div>
       <fieldset>
-        <legend>How will you uncover the board?</legend>
+        <legend>Pick your kind of mystery</legend>
         <label
           className={`mode-choice ${mode === "SCORE_ONLY" ? "chosen" : ""}`}
         >
@@ -120,9 +143,12 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
             checked={mode === "SCORE_ONLY"}
             onChange={() => setMode("SCORE_ONLY")}
           />
+          <span className="mode-icon" aria-hidden="true">
+            ?
+          </span>
           <span>
             <strong>Score-only</strong>
-            <small>Only the turn total. Every bonus stays hidden.</small>
+            <small>Follow the scores. Trust your hunch.</small>
           </span>
         </label>
         <label
@@ -134,12 +160,41 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
             checked={mode === "REVEAL_USED"}
             onChange={() => setMode("REVEAL_USED")}
           />
+          <span className="mode-icon" aria-hidden="true">
+            ✦
+          </span>
           <span>
             <strong>Reveal-used</strong>
-            <small>Discover each square’s bonus when a tile is played.</small>
+            <small>Play a tile. Reveal its bonus.</small>
           </span>
         </label>
       </fieldset>
+      <details className="players-options">
+        <summary>
+          Who’s playing? <span>Player names (optional)</span>
+        </summary>{" "}
+        <div className="name-fields">
+          {names.map((n, i) => (
+            <label key={i}>
+              Player {i + 1}
+              <input
+                maxLength={32}
+                value={n}
+                onChange={(e) =>
+                  setNames(names.map((v, j) => (j === i ? e.target.value : v)))
+                }
+              />
+            </label>
+          ))}
+        </div>
+      </details>
+      <button
+        className={`primary full new-start ${hasSave ? "with-save" : ""}`}
+        disabled={busy}
+        onClick={() => (hasSave ? setConfirm(true) : begin())}
+      >
+        <span aria-hidden="true" className="play-arrow" /> New game
+      </button>
       {DEV_TOOLS && (
         <details className="dev">
           <summary>Developer fixtures</summary>
@@ -160,14 +215,7 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           </label>
         </details>
       )}
-      <button
-        className="primary full"
-        disabled={busy}
-        onClick={() => (hasSave ? setConfirm(true) : begin())}
-      >
-        New game
-      </button>
-      <details>
+      <details className="how-to">
         <summary>How to play & install</summary>
         <p>
           Start with a word crossing H8, the ordinary center. Select a rack
@@ -258,23 +306,26 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
       setPending((p) => p.filter((v) => v.at !== at));
     } else setSheet("inspect");
   };
-  const board: CellView[] = displayed.board.map((cell, i) => {
-    if (!active || historyTurn !== undefined) return cell;
-    const p = pending.find((p) => p.at === i);
-    if (!p) return cell;
-    const tile = view.rack.find((t) => t.id === p.id);
-    if (!tile) return cell;
-    return {
-      ...cell,
-      bonus: undefined,
-      tile: {
-        letter: p.blankAs ?? tile.kind,
-        value: tile.value,
-        blank: tile.kind === "BLANK",
-      },
-      fresh: true,
-    };
-  });
+  const board: (CellView & { staged?: boolean })[] = displayed.board.map(
+    (cell, i) => {
+      if (!active || historyTurn !== undefined) return cell;
+      const p = pending.find((p) => p.at === i);
+      if (!p) return cell;
+      const tile = view.rack.find((t) => t.id === p.id);
+      if (!tile) return cell;
+      return {
+        ...cell,
+        bonus: undefined,
+        tile: {
+          letter: p.blankAs ?? tile.kind,
+          value: tile.value,
+          blank: tile.kind === "BLANK",
+        },
+        fresh: true,
+        staged: true,
+      };
+    },
+  );
   const turnAction = async (type: "PASS" | "EXCHANGE") => {
     const ok = await controller.action(
       type === "PASS" ? { type } : { type, ids: exchange ?? [] },
@@ -298,11 +349,12 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
     return (
       <section className="gate panel">
         <div className="gate-icon" aria-hidden="true">
-          ↔
+          <span>{view.active + 1}</span>
+          <i>✦</i>
         </div>
-        <p className="eyebrow">YOUR WORDS CAN WAIT</p>
+        <p className="eyebrow">NEXT UP. NEW POSSIBILITIES.</p>
         <h2>
-          Pass to
+          Your move,
           <br />
           {view.names[view.active]}
         </h2>
@@ -332,10 +384,26 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
     <>
       <section className="score-strip" aria-label="Scores">
         {view.names.map((name, i) => (
-          <div key={i} className={i === view.active ? "current-player" : ""}>
-            <span>
+          <div
+            key={i}
+            className={
+              view.phase === "OVER"
+                ? view.scores[i] > view.scores[1 - i]
+                  ? "winning-player"
+                  : ""
+                : i === view.active
+                  ? "current-player"
+                  : ""
+            }
+          >
+            <span className="player-number" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span className="player-name">
               {name}
-              {i === view.active && active ? " · playing" : ""}
+              <small>
+                {i === view.active && active ? "Your turn" : "Points"}
+              </small>
             </span>
             <strong>{view.scores[i]}</strong>
           </div>
@@ -344,6 +412,9 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
       {view.phase === "OVER" ? (
         <section className="panel endgame">
           <p className="eyebrow">GAME OVER · FULL BOARD REVEALED</p>
+          <div className="end-sparkles" aria-hidden="true">
+            ✦ <span>W</span> ✦
+          </div>
           <h2>{endText}</h2>
           <p>
             {view.endReason === "RACK_OUT"
@@ -385,7 +456,10 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
       {view.phase === "RESULT" && view.result && (
         <section className="result panel" role="status">
           <p className="eyebrow">
-            TURN RESULT · {view.names[view.result.player]}
+            {view.result.total > 0
+              ? "WELL PLAYED!"
+              : "NEXT TURN, NEW POSSIBILITIES"}{" "}
+            · {view.names[view.result.player]}
           </p>
           <h2>
             +{view.result.total} <small>points</small>
@@ -660,8 +734,8 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
           onClose={closeSheet}
         >
           <p>
-            A private hypothesis, mirrored to the opposite square. These guesses
-            are never checked.
+            Your private guesses, mirrored to the opposite square. Pick any
+            combination; guesses are never checked.
           </p>
           {selectedCell === 112 ? (
             <p>H8 is locked ordinary by rule.</p>
@@ -688,12 +762,14 @@ function GameScreen({ view, busy }: { view: PlayerView; busy: boolean }) {
                   Your note has no possibilities selected.
                 </p>
               )}
-              <button onClick={() => void controller.note(selectedCell, 31)}>
-                Reset to unknown
-              </button>
-              <button onClick={() => void controller.note(selectedCell, 0)}>
-                Clear hypothesis
-              </button>
+              <div className="note-reset-actions">
+                <button onClick={() => void controller.note(selectedCell, 31)}>
+                  Reset to unknown
+                </button>
+                <button onClick={() => void controller.note(selectedCell, 0)}>
+                  Clear hypothesis
+                </button>
+              </div>
             </>
           )}
           <button className="primary full" onClick={closeSheet}>

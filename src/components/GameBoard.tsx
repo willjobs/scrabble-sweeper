@@ -6,7 +6,7 @@ export function GameBoard({
   onSquare,
   notesMode = false,
 }: {
-  board: CellView[];
+  board: (CellView & { staged?: boolean })[];
   selected: number | null;
   onSquare: (i: number) => void;
   notesMode?: boolean;
@@ -38,8 +38,8 @@ export function GameBoard({
               <button
                 key={i}
                 data-testid={`cell-${i}`}
-                aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i !== 112 && cell.note !== undefined && cell.note !== 31 ? ", your note" : ""}`}
-                className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${highlight ? "pair-highlight" : ""} ${bonus ? "bonus-" + bonus : ""}`}
+                aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}${cell.staged ? ", staged" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i !== 112 && cell.note !== undefined && cell.note !== 31 ? ", your note" : ""}`}
+                className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${bonus ? "bonus-" + bonus : ""}`}
                 onClick={() => onSquare(i)}
               >
                 {tile ? (
