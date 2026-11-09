@@ -365,3 +365,43 @@ test("storage failure export recovers the newest in-memory turn and Home reports
   await expect(page.getByRole("dialog")).toContainText("in memory");
   await expect(page.getByRole("dialog")).not.toContainText("game is saved");
 });
+
+test("320px blank picker, note labels and long-name handoff fit their controls", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.goto("/");
+  await page.locator(".players-options summary").click();
+  await page
+    .getByLabel("Player 2", { exact: true })
+    .fill("MaximilianTheMysteryWordMaster");
+  await page.getByText("Developer fixtures", { exact: true }).click();
+  await page.getByLabel("Starting rack").selectOption("blank");
+  await page.getByRole("button", { name: "New game", exact: true }).click();
+  await place(page, "blank", 112);
+  const dialog = page.getByRole("dialog");
+  const bounds = (await dialog.boundingBox())!;
+  for (const letter of "EJOTY") {
+    const button = (await dialog
+      .getByRole("button", { name: letter, exact: true })
+      .boundingBox())!;
+    expect(button.x + button.width).toBeLessThan(bounds.x + bounds.width - 10);
+  }
+  await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+  await page.getByRole("button", { name: "Notes", exact: true }).click();
+  await page.getByTestId("cell-0").click();
+  const fitsText = await dialog
+    .getByRole("button", { name: "Ordinary", exact: true })
+    .evaluate((el) => el.scrollWidth <= el.clientWidth);
+  expect(fitsText).toBe(true);
+  await dialog.getByRole("button", { name: "Done", exact: true }).click();
+  await page.getByRole("button", { name: "Pass", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm pass" }).click();
+  await page.getByRole("button", { name: "Pass device", exact: true }).click();
+  const start = page.getByRole("button", {
+    name: "I’m MaximilianTheMysteryWordMaster — Start turn",
+  });
+  expect(await start.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
+    true,
+  );
+});

@@ -53,7 +53,7 @@ Playwright uses installed `/usr/bin/chromium` by default here. Else set `CHROMIU
 
 ## Architecture and limitations
 
-- `src/engine/`: bag/PRNG, generator, word discovery, scoring, transitions, history and player projection. Engine has no DOM/storage/network imports. `dictionary.ts` is a one-time bundled raw-text import into a Set.
+- `src/engine/`: bag/PRNG, generator, word discovery, scoring, transitions, history and player projection. Engine has no DOM/storage/network imports. `dictionary-meta.ts` holds the pinned ID without loading the list. The controller prefetches `dictionary.ts` after the opening UI paints and awaits its Set before word validation; the split dictionary chunk is also precached offline.
 - `src/controller.ts`: keeps authoritative data outside React state, serializes storage and actions, publishes only safe projections.
 - `src/components/` and `src/App.tsx`: tap interactions, dialogs, board and privacy gates. No authoritative state is passed as UI props.
 - `src/storage/`: versioned IndexedDB snapshots, structural and inventory/history validation, serialized writes. Unsupported schema/rules/dictionary versions produce a warning and an export option, without silently resetting. No migrations are currently supported.

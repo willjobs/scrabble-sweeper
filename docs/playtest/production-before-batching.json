@@ -1,0 +1,129 @@
+[
+  {
+    "name": "Cold production startup at 4x CPU, three fresh browser contexts",
+    "status": "PASS",
+    "data": [
+      {
+        "fcp": 524,
+        "largestPrePaint": 190,
+        "largestTotal": 585,
+        "tasks": [
+          {
+            "start": 206.1000000005588,
+            "duration": 190
+          },
+          {
+            "start": 766.5,
+            "duration": 585
+          }
+        ],
+        "dictionary": [
+          {
+            "start": 546.3000000007451,
+            "end": 730.1000000005588,
+            "duration": 183.79999999981374
+          }
+        ]
+      },
+      {
+        "fcp": 504,
+        "largestPrePaint": 185,
+        "largestTotal": 553,
+        "tasks": [
+          {
+            "start": 154.90000000037253,
+            "duration": 185
+          },
+          {
+            "start": 347.90000000037253,
+            "duration": 54
+          },
+          {
+            "start": 781.5999999996275,
+            "duration": 553
+          }
+        ],
+        "dictionary": [
+          {
+            "start": 509.59999999962747,
+            "end": 749.4000000003725,
+            "duration": 239.80000000074506
+          }
+        ]
+      },
+      {
+        "fcp": 500,
+        "largestPrePaint": 159,
+        "largestTotal": 505,
+        "tasks": [
+          {
+            "start": 199.20000000018626,
+            "duration": 159
+          },
+          {
+            "start": 830.3999999994412,
+            "duration": 505
+          }
+        ],
+        "dictionary": [
+          {
+            "start": 505.3999999994412,
+            "end": 793.2000000001863,
+            "duration": 287.80000000074506
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "name": "Natural production game notes response at 4x CPU",
+    "status": "PASS",
+    "data": {
+      "min": 18.399999999441206,
+      "max": 45.59999999962747,
+      "mean": 29.833333333333332,
+      "times": [
+        37.89999999944121, 24, 24.59999999962747, 27.200000000186265,
+        45.59999999962747, 33, 33.10000000055879, 33.40000000037253,
+        35.80000000074506, 22.200000000186265, 22.799999999813735,
+        18.399999999441206
+      ]
+    }
+  },
+  {
+    "name": "Production 320/390/desktop opening fits without horizontal page scroll",
+    "status": "PASS",
+    "data": [
+      {
+        "width": 320,
+        "scroll": 320
+      },
+      {
+        "width": 390,
+        "scroll": 390
+      },
+      {
+        "width": 1280,
+        "scroll": 1280
+      }
+    ]
+  },
+  {
+    "name": "Production offline refresh and dictionary-backed placement",
+    "status": "PASS",
+    "data": {
+      "turn": 2,
+      "word": "AT"
+    }
+  },
+  {
+    "name": "Dictionary download failure then same-page submission recovery",
+    "status": "PASS",
+    "data": {
+      "blocked": 3,
+      "recovered": true,
+      "error": [],
+      "turn": 2
+    }
+  }
+]

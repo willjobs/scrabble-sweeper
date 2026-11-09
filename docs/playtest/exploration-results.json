@@ -1,0 +1,55 @@
+{
+  "results": [
+    {
+      "name": "Connected game, notes, history, exchange and completion: Score-only",
+      "status": "PASS",
+      "data": {
+        "totals": [
+          "+2 points",
+          "+5 points",
+          "+6 points",
+          "+4 points",
+          "+3 points"
+        ],
+        "final": [-8, -17],
+        "moves": 11
+      }
+    },
+    {
+      "name": "Connected game, notes, history, exchange and completion: Reveal-used",
+      "status": "PASS",
+      "data": {
+        "totals": [
+          "+2 points",
+          "+5 points",
+          "+6 points",
+          "+4 points",
+          "+3 points"
+        ],
+        "final": [-8, -17],
+        "moves": 11
+      }
+    },
+    {
+      "name": "Matched modes yield identical scores for same actions",
+      "status": "PASS",
+      "data": [
+        ["+2 points", "+5 points", "+6 points", "+4 points", "+3 points"],
+        ["+2 points", "+5 points", "+6 points", "+4 points", "+3 points"]
+      ]
+    },
+    {
+      "name": "320px blank cancellation/assignment, repositioning, long names and notes",
+      "status": "PASS"
+    },
+    {
+      "name": "Quota-style failure exports latest in-memory game and accurate unsaved Home",
+      "status": "PASS"
+    },
+    {
+      "name": "Natural draw and new-game replacement cancellation",
+      "status": "PASS"
+    }
+  ],
+  "pageErrors": []
+}

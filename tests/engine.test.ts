@@ -533,7 +533,7 @@ describe("additional vertical and persistence boundaries", () => {
   test("dictionary contains stable ordinary words and is normalized", () => {
     for (const word of ["AT", "CAT", "WE", "RETAINS"])
       expect(dictionary.has(word)).toBe(true);
-    expect(dictionary.size).toBeGreaterThan(100000);
+    expect(dictionary.size).toBe(274926);
     expect([...dictionary].every((w) => /^[A-Z]{2,}$/.test(w))).toBe(true);
   });
 });

@@ -49,7 +49,7 @@ Tests group related requirements instead of creating a file per ID. This table d
 
 Toolchain existed before feature work. The repo pre-commit hook runs `npm run check`: ESLint → strict TypeScript → all Vitest tests → all Playwright tests (including a production-style PWA build with fixture tools explicitly enabled). No hook bypasses.
 
-Current unit/component suite: **48 tests** in four files, including the 1,000-seed generator run. Browser suite: **12 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
+Current unit/component suite: **49 tests** in four files, including the 1,000-seed generator run. Browser suite: **16 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
 
 ## Screenshots
 
@@ -58,3 +58,5 @@ Chromium, portrait 390px: [New game](screenshots/new-game.png), [gameplay](scree
 ## Remaining limitations
 
 The offline local client is inspectable with developer tools/IndexedDB and is not anti-cheat secure. The Letterpress word list differs from official tournament lists. No cross-device synchronization, old-save migrations, multiple-tab coordination or storage-eviction protection. Physical Safari, Android and non-Chromium desktop behavior are unverified. Soft generator balance is heuristic and needs playtest evidence. The app does not automatically solve or verify hypotheses. No locked game mechanics were intentionally changed.
+
+The follow-up code review and fixes are recorded in [CODE_REVIEW.md](CODE_REVIEW.md). Independent exploratory Playwright testing and screenshot review are recorded under `docs/playtest/`.

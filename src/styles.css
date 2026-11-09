@@ -1815,3 +1815,28 @@ select {
     margin-top: 4px;
   }
 }
+
+/* Keep narrow-phone controls readable inside their actual container. */
+.alphabet {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.alphabet button {
+  min-width: 0;
+  padding-inline: 0;
+}
+.gate .primary {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 350px) {
+  .note-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .note-options button,
+  .note-options button:nth-child(4) {
+    grid-column: auto;
+    min-width: 0;
+  }
+  .note-options button:first-child {
+    grid-column: 1 / -1;
+  }
+}
