@@ -1,0 +1,348 @@
+
+> hidden-bonus@1.0.0 boards:inspect
+> tsx scripts/inspect-boards.ts 20
+
+
+Seed review-0; quality penalty 88
+DW  .  . DL  .  . TW  .  .  . TL  .  . DW  .
+ . DL  . TL  .  . DL DW  .  .  .  .  .  .  .
+ . TW  .  .  .  .  .  .  .  .  .  .  . DL DL
+ .  .  .  .  . DL  .  .  .  . TL  . TW  .  .
+DL  . DL  .  . DW  .  .  .  .  .  .  .  .  .
+ . TW  .  .  . DL  .  .  . TL DW DW DW  .  .
+DW  . DL  . TL  . TL  .  .  .  .  .  .  . DL
+ .  .  . DL  .  .  .  .  .  .  . DL  .  .  .
+DL  .  .  .  .  .  .  . TL  . TL  . DL  . DW
+ .  . DW DW DW TL  .  .  . DL  .  .  . TW  .
+ .  .  .  .  .  .  .  .  . DW  .  . DL  . DL
+ .  . TW  . TL  .  .  .  . DL  .  .  .  .  .
+DL DL  .  .  .  .  .  .  .  .  .  .  . TW  .
+ .  .  .  .  .  .  . DW DL  .  . TL  . DL  .
+ . DW  .  . TL  .  .  . TW  .  . DL  .  . DW
+
+Seed review-1; quality penalty 92
+ . TL DW DW DW  .  .  .  .  .  . TL DL  . TW
+DW  .  .  .  .  .  .  .  .  .  . DL  .  .  .
+TL  . TL DL DL  .  .  . DL  .  . TL DL  . DW
+ .  .  . DL  .  . TW  . DW  .  .  .  .  .  .
+ .  .  . DL  .  .  . TL  .  .  .  . DL  .  .
+ .  .  . DW  . DL  . DL  .  .  .  .  . TW  .
+ .  . DL  .  .  .  .  .  .  .  .  .  .  .  .
+ .  . TW  .  . DW  .  .  . DW  .  . TW  .  .
+ .  .  .  .  .  .  .  .  .  .  .  . DL  .  .
+ . TW  .  .  .  .  . DL  . DL  . DW  .  .  .
+ .  . DL  .  .  .  . TL  .  .  . DL  .  .  .
+ .  .  .  .  .  . DW  . TW  .  . DL  .  .  .
+DW  . DL TL  .  . DL  .  .  . DL DL TL  . TL
+ .  .  . DL  .  .  .  .  .  .  .  .  .  . DW
+TW  . DL TL  .  .  .  .  .  . DW DW DW TL  .
+
+Seed review-2; quality penalty 74
+TL DL TW  .  .  .  .  .  .  .  .  .  . DL  .
+ .  .  .  . DL  . DW  .  .  .  .  .  .  . DW
+ .  .  .  .  .  .  .  .  .  .  . DW  . TL  .
+DW  .  . DW DL  . TL TL  .  .  .  . TW  . DL
+DL  .  .  .  .  . DL  .  .  .  .  . DW DL  .
+ .  . DL  .  .  . DL  .  . DW  .  . TL  .  .
+ . TW  . DL  .  .  .  . TL  .  .  .  . TW  .
+ .  .  . DL DW  .  .  .  .  . DW DL  .  .  .
+ . TW  .  .  .  . TL  .  .  .  . DL  . TW  .
+ .  . TL  .  . DW  .  . DL  .  .  . DL  .  .
+ . DL DW  .  .  .  .  . DL  .  .  .  .  . DL
+DL  . TW  .  .  .  . TL TL  . DL DW  .  . DW
+ . TL  . DW  .  .  .  .  .  .  .  .  .  .  .
+DW  .  .  .  .  .  .  . DW  . DL  .  .  .  .
+ . DL  .  .  .  .  .  .  .  .  .  . TW DL TL
+
+Seed review-3; quality penalty 86
+ .  .  .  .  .  .  .  .  . TW DW  .  .  . DW
+ . TW DW  .  .  .  . DL  .  .  .  . DL  .  .
+ .  .  . TL DW  .  . DL TL  .  . DL  .  .  .
+ . TL TL DL  .  .  . TW  .  .  . DL  .  .  .
+ .  .  .  .  .  .  . DW  .  . DL  .  .  . DL
+ .  .  .  . TL  .  . DL  .  .  . TL  . DL  .
+ .  .  .  .  .  . DW  .  .  .  . DL  . DL  .
+DW TW  .  .  . DW  .  .  . DW  .  .  . TW DW
+ . DL  . DL  .  .  .  . DW  .  .  .  .  .  .
+ . DL  . TL  .  .  . DL  .  . TL  .  .  .  .
+DL  .  .  . DL  .  . DW  .  .  .  .  .  .  .
+ .  .  . DL  .  .  . TW  .  .  . DL TL TL  .
+ .  .  . DL  .  . TL DL  .  . DW TL  .  .  .
+ .  . DL  .  .  .  . DL  .  .  .  . DW TW  .
+DW  .  .  . DW TW  .  .  .  .  .  .  .  .  .
+
+Seed review-4; quality penalty 104
+ . TW  .  . DL  . DL  .  .  .  . TW TL  .  .
+ .  .  .  .  .  .  .  .  . DL DL DW  . DL  .
+ .  . TW  . DW TL  .  .  . DW  .  . DL  .  .
+DL  .  .  . DL  .  .  . TL DW  .  . TL  .  .
+DL DW  .  .  .  .  .  .  .  .  . DL  . DW DL
+ .  . TW  .  .  .  .  .  .  . TL  . DW  . TL
+ .  .  .  .  .  .  . DW  .  .  .  . DL  .  .
+ .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+ .  . DL  .  .  .  . DW  .  .  .  .  .  .  .
+TL  . DW  . TL  .  .  .  .  .  .  . TW  .  .
+DL DW  . DL  .  .  .  .  .  .  .  .  . DW DL
+ .  . TL  .  . DW TL  .  .  . DL  .  .  . DL
+ .  . DL  .  . DW  .  .  . TL DW  . TW  .  .
+ . DL  . DW DL DL  .  .  .  .  .  .  .  .  .
+ .  . TL TW  .  .  .  . DL  . DL  .  . TW  .
+
+Seed review-5; quality penalty 74
+ .  . DW  .  .  .  . DL  .  . DW  .  .  .  .
+ .  .  .  .  .  .  . DL DW  .  .  .  . TL TW
+ .  .  .  . DW  . DW  .  . DL TL TL  .  .  .
+ . DW DL  . DL  . DL TW  . TL  .  . TL  . DL
+ . TL  .  .  .  .  .  .  .  .  .  .  .  . DW
+ .  .  .  .  .  . DL  .  .  .  .  . DL  .  .
+ .  .  .  . TW DL  .  .  .  . DL  . DL  . TW
+ . DW  .  .  .  .  .  .  .  .  .  .  . DW  .
+TW  . DL  . DL  .  .  .  . DL TW  .  .  .  .
+ .  . DL  .  .  .  .  . DL  .  .  .  .  .  .
+DW  .  .  .  .  .  .  .  .  .  .  .  . TL  .
+DL  . TL  .  . TL  . TW DL  . DL  . DL DW  .
+ .  .  . TL TL DL  .  . DW  . DW  .  .  .  .
+TW TL  .  .  .  . DW DL  .  .  .  .  .  .  .
+ .  .  .  . DW  .  . DL  .  .  .  . DW  .  .
+
+Seed review-6; quality penalty 76
+DW TL TL  . DL  .  .  .  .  . DW  .  . TL TL
+DW  . DL DL DL DW  .  .  .  . DL  .  .  . DW
+ .  .  .  .  .  .  .  .  .  . DL  .  .  .  .
+TW TL  .  .  .  .  .  . TW  .  .  .  .  .  .
+ .  .  .  .  .  .  .  .  .  .  .  .  . TW  .
+ .  . DW  .  .  .  .  . DW  .  .  . DL  .  .
+DL TL DL  .  . DL  .  .  . DL  . TW  .  .  .
+ .  .  .  . DL  . DW  . DW  . DL  .  .  .  .
+ .  .  . TW  . DL  .  .  . DL  .  . DL TL DL
+ .  . DL  .  .  . DW  .  .  .  .  . DW  .  .
+ . TW  .  .  .  .  .  .  .  .  .  .  .  .  .
+ .  .  .  .  .  . TW  .  .  .  .  .  . TL TW
+ .  .  .  . DL  .  .  .  .  .  .  .  .  .  .
+DW  .  .  . DL  .  .  .  . DW DL DL DL  . DW
+TL TL  .  . DW  .  .  .  .  . DL  . TL TL DW
+
+Seed review-7; quality penalty 84
+TW  .  .  .  .  . TW  . DL DL TL  .  .  . DL
+ .  .  . DL TW  .  . DW  .  .  .  .  .  . TW
+DW  .  .  .  .  . DW  .  .  .  .  . DL DW  .
+ .  .  .  .  .  .  . DL  . DL DW  . TL  .  .
+ .  .  .  .  .  .  .  . TL  .  .  .  .  . DL
+ .  .  .  .  . TL  . DL  .  .  .  . TL  .  .
+DL  .  .  .  .  .  .  .  . DL  . DL DW  . DW
+TL DW  .  .  .  .  .  .  .  .  .  .  . DW TL
+DW  . DW DL  . DL  .  .  .  .  .  .  .  . DL
+ .  . TL  .  .  .  . DL  . TL  .  .  .  .  .
+DL  .  .  .  .  . TL  .  .  .  .  .  .  .  .
+ .  . TL  . DW DL  . DL  .  .  .  .  .  .  .
+ . DW DL  .  .  .  .  . DW  .  .  .  .  . DW
+TW  .  .  .  .  .  . DW  .  . TW DL  .  .  .
+DL  .  .  . TL DL DL  . TW  .  .  .  .  . TW
+
+Seed review-8; quality penalty 82
+ .  .  . TW  . TL  . DW  .  .  .  .  .  .  .
+DW TL  .  .  .  .  .  .  . DW  .  .  . DW DL
+ .  .  .  . TW  .  .  .  .  .  . TL DW TL  .
+ .  .  .  .  . DL TL  . TL  . DL DL  .  . TW
+DL TW  .  .  .  .  .  .  . DL  .  .  . DL  .
+ .  .  .  . DW  .  .  . DL DL  .  .  .  .  .
+ .  .  .  .  .  .  . DL DW DL  .  .  . DW  .
+ .  .  .  .  .  . DL  . DL  .  .  .  .  .  .
+ . DW  .  .  . DL DW DL  .  .  .  .  .  .  .
+ .  .  .  .  . DL DL  .  .  . DW  .  .  .  .
+ . DL  .  .  . DL  .  .  .  .  .  .  . TW DL
+TW  .  . DL DL  . TL  . TL DL  .  .  .  .  .
+ . TL DW TL  .  .  .  .  .  . TW  .  .  .  .
+DL DW  .  .  . DW  .  .  .  .  .  .  . TL DW
+ .  .  .  .  .  .  . DW  . TL  . TW  .  .  .
+
+Seed review-9; quality penalty 84
+ . DL  . TW  . TW  .  .  . TL DL  .  . TL TL
+TW  .  .  .  . DL  .  .  .  .  .  . DL  . DW
+ .  . DL  . DL  .  .  .  .  . DW DL DL  .  .
+ .  .  .  .  . DL  .  .  .  .  .  . DL DW  .
+DW  .  .  .  .  .  . TW  .  .  .  .  .  .  .
+ . DW  .  . DW  .  . TL  .  .  .  .  .  .  .
+DL DW TL DL  .  .  . DW  .  .  .  .  .  .  .
+ .  .  . TL  .  .  .  .  .  .  . TL  .  .  .
+ .  .  .  .  .  .  . DW  .  .  . DL TL DW DL
+ .  .  .  .  .  .  . TL  .  . DW  .  . DW  .
+ .  .  .  .  .  .  . TW  .  .  .  .  .  . DW
+ . DW DL  .  .  .  .  .  . DL  .  .  .  .  .
+ .  . DL DL DW  .  .  .  .  . DL  . DL  .  .
+DW  . DL  .  .  .  .  .  . DL  .  .  .  . TW
+TL TL  .  . DL TL  .  .  . TW  . TW  . DL  .
+
+Seed review-10; quality penalty 86
+ .  .  .  .  .  .  . TW  . DL DW TL TL  .  .
+DW  .  .  .  .  .  . TL  .  .  . TW  .  .  .
+DL  . TL  .  .  . DL DW  .  .  .  .  .  . DL
+ .  . DL  .  .  .  .  .  . DL TW  .  .  .  .
+ . DL  .  .  . DW  .  .  .  .  . DW  .  .  .
+DL  .  . TW TL  .  .  .  .  .  . DL  .  .  .
+DW DW  .  .  .  .  . DL  .  .  .  .  .  . TL
+ .  .  . DW  . DL DL  . DL DL  . DW  .  .  .
+TL  .  .  .  .  .  . DL  .  .  .  .  . DW DW
+ .  .  . DL  .  .  .  .  .  . TL TW  .  . DL
+ .  .  . DW  .  .  .  .  . DW  .  .  . DL  .
+ .  .  .  . TW DL  .  .  .  .  .  . DL  .  .
+DL  .  .  .  .  .  . DW DL  .  .  . TL  . DL
+ .  .  . TW  .  .  . TL  .  .  .  .  .  . DW
+ .  . TL TL DW DL  . TW  .  .  .  .  .  .  .
+
+Seed review-11; quality penalty 80
+ .  .  .  .  .  . TL  . TW  .  . DW  .  .  .
+ .  .  . TW  .  .  .  .  .  .  .  .  .  .  .
+DL  . TL DL  .  .  . DL TL  .  .  .  .  .  .
+TL  . TL  . DW  .  . DW  .  .  . DL DL  .  .
+ . DL  .  .  .  .  .  .  . DW  .  . TL  . TW
+ . DW  .  .  .  . DL DL  .  .  .  .  .  . DW
+DL TW  .  . DW  .  .  .  .  .  .  .  . DL  .
+ .  . DW  .  . DL DL  . DL DL  .  . DW  .  .
+ . DL  .  .  .  .  .  .  .  . DW  .  . TW DL
+DW  .  .  .  .  .  . DL DL  .  .  .  . DW  .
+TW  . TL  .  . DW  .  .  .  .  .  .  . DL  .
+ .  . DL DL  .  .  . DW  .  . DW  . TL  . TL
+ .  .  .  .  .  . TL DL  .  .  . DL TL  . DL
+ .  .  .  .  .  .  .  .  .  .  . TW  .  .  .
+ .  .  . DW  .  . TW  . TL  .  .  .  .  .  .
+
+Seed review-12; quality penalty 82
+ . DW TL  .  .  .  . DL  .  .  .  .  .  .  .
+ .  .  .  .  . DW  .  . DL DL  .  .  . DW TW
+ .  .  .  .  .  .  .  .  .  .  .  . DL  .  .
+ . TL  . TL  .  . TW  . DW  .  . DW  .  .  .
+ .  . DL  .  .  . DL  . DL DL TL TL  .  .  .
+DW  . TL  . DL DW  .  .  .  .  .  .  .  .  .
+ . TW  .  .  .  .  .  .  .  .  .  .  .  . DW
+DL DL DL  . TW  .  .  .  .  . TW  . DL DL DL
+DW  .  .  .  .  .  .  .  .  .  .  .  . TW  .
+ .  .  .  .  .  .  .  .  . DW DL  . TL  . DW
+ .  .  . TL TL DL DL  . DL  .  .  . DL  .  .
+ .  .  . DW  .  . DW  . TW  .  . TL  . TL  .
+ .  . DL  .  .  .  .  .  .  .  .  .  .  .  .
+TW DW  .  .  . DL DL  .  . DW  .  .  .  .  .
+ .  .  .  .  .  .  . DL  .  .  .  . TL DW  .
+
+Seed review-13; quality penalty 98
+ .  .  . DW  .  .  . TL  .  . TL  .  .  .  .
+TL  . TW DL  .  .  . DL DL TL DW  .  .  .  .
+ . DW  .  .  .  .  .  . DW TW  .  .  .  .  .
+ .  . DL  .  . DW  .  .  .  .  . DL  .  .  .
+TW  . TL  .  . DL  .  .  .  .  .  . DW  .  .
+ . DL  .  .  .  . DW DL DL  .  . DL DL  .  .
+ .  . TW  .  .  .  . TL  .  .  .  .  .  .  .
+ . DL DW  .  .  .  .  .  .  .  .  . DW DL  .
+ .  .  .  .  .  .  . TL  .  .  .  . TW  .  .
+ .  . DL DL  .  . DL DL DW  .  .  .  . DL  .
+ .  . DW  .  .  .  .  .  . DL  .  . TL  . TW
+ .  .  . DL  .  .  .  .  . DW  .  . DL  .  .
+ .  .  .  .  . TW DW  .  .  .  .  .  . DW  .
+ .  .  .  . DW TL DL DL  .  .  . DL TW  . TL
+ .  .  .  . TL  .  . TL  .  .  . DW  .  .  .
+
+Seed review-14; quality penalty 88
+ . DW  .  . TL  .  .  .  .  .  . TL  .  . DL
+ .  .  . TL  .  .  .  .  .  .  .  . DL DW  .
+TW  .  .  . TW  . DW  .  . TL  .  . DL DW  .
+ .  .  .  . DL DL  .  . DW  . DL DW  .  .  .
+ .  .  . TL  .  .  . TL  .  .  .  .  .  . DL
+ .  . DL  .  .  .  . DL  .  .  .  . DW  . TW
+ .  . DL  . DL  .  .  .  .  .  .  .  .  .  .
+DL  .  . TW  .  . DW  . DW  .  . TW  .  . DL
+ .  .  .  .  .  .  .  .  .  . DL  . DL  .  .
+TW  . DW  .  .  .  . DL  .  .  .  . DL  .  .
+DL  .  .  .  .  .  . TL  .  .  . TL  .  .  .
+ .  .  . DW DL  . DW  .  . DL DL  .  .  .  .
+ . DW DL  .  . TL  .  . DW  . TW  .  .  . TW
+ . DW DL  .  .  .  .  .  .  .  . TL  .  .  .
+DL  .  . TL  .  .  .  .  .  . TL  .  . DW  .
+
+Seed review-15; quality penalty 98
+ .  .  .  .  .  .  .  . DL  .  .  .  .  .  .
+DW DW  . TL TL  . TL DL  .  .  . DL DW  . DW
+TW  .  . TL  .  . DW  .  .  .  .  .  .  .  .
+ .  .  .  .  .  . DL TL TW  . DL  .  .  .  .
+ .  . DL DW  .  .  . DL  .  .  .  .  . TW DL
+DL  .  .  . DW  .  .  .  . DW  .  . DL  .  .
+ . TL  .  . TW  .  .  .  .  .  .  .  .  . DL
+ .  .  .  . DL  .  .  .  .  . DL  .  .  .  .
+DL  .  .  .  .  .  .  .  .  . TW  .  . TL  .
+ .  . DL  .  . DW  .  .  .  . DW  .  .  . DL
+DL TW  .  .  .  .  . DL  .  .  . DW DL  .  .
+ .  .  .  . DL  . TW TL DL  .  .  .  .  .  .
+ .  .  .  .  .  .  .  . DW  .  . TL  .  . TW
+DW  . DW DL  .  .  . DL TL  . TL TL  . DW DW
+ .  .  .  .  .  . DL  .  .  .  .  .  .  .  .
+
+Seed review-16; quality penalty 90
+ . TW  .  .  . DL  . DL  .  .  .  .  . DL DW
+ .  .  .  .  .  . DL TW  .  .  .  .  . DW  .
+ .  .  .  .  .  .  . DL  .  .  . DW TL TL  .
+DL  .  .  .  .  .  .  .  .  .  . DL  . DL DW
+ .  . TL  .  . DW  . DL  .  .  . TL  .  . DW
+ .  .  . DW  .  .  .  .  .  .  . DL  .  . DL
+ . TW  .  .  .  .  . TL DW  .  . TW  .  .  .
+ .  .  . DL  . TL  .  .  . TL  . DL  .  .  .
+ .  .  . TW  .  . DW TL  .  .  .  .  . TW  .
+DL  .  . DL  .  .  .  .  .  .  . DW  .  .  .
+DW  .  . TL  .  .  . DL  . DW  .  . TL  .  .
+DW DL  . DL  .  .  .  .  .  .  .  .  .  . DL
+ . TL TL DW  .  .  . DL  .  .  .  .  .  .  .
+ . DW  .  .  .  .  . TW DL  .  .  .  .  .  .
+DW DL  .  .  .  .  . DL  . DL  .  .  . TW  .
+
+Seed review-17; quality penalty 92
+ . DW  .  .  .  . TW  .  .  .  . DL  . DL  .
+DW  . DL TW  .  .  . TL  .  .  .  .  .  . DW
+ .  .  .  . DL  . DL  .  .  . DL  .  . DL  .
+ . TL TW  .  .  .  . DL  .  .  . DW  .  . DL
+ .  .  .  . DW  .  . TW  .  .  .  .  . DL  .
+ . TL  .  .  .  .  . DW  . TL DL  .  .  .  .
+ .  .  .  .  .  .  .  . TL DL DW  .  .  .  .
+ .  .  . DW  .  . TL  . TL  .  . DW  .  .  .
+ .  .  .  . DW DL TL  .  .  .  .  .  .  .  .
+ .  .  .  . DL TL  . DW  .  .  .  .  . TL  .
+ . DL  .  .  .  .  . TW  .  . DW  .  .  .  .
+DL  .  . DW  .  .  . DL  .  .  .  . TW TL  .
+ . DL  .  . DL  .  .  . DL  . DL  .  .  .  .
+DW  .  .  .  .  .  . TL  .  .  . TW DL  . DW
+ . DL  . DL  .  .  .  . TW  .  .  .  . DW  .
+
+Seed review-18; quality penalty 66
+ .  .  .  .  . DW  .  .  . DL  .  . TL  .  .
+ .  .  .  .  .  .  .  . TW  .  .  . DL  .  .
+ .  .  .  .  .  .  .  .  .  . TL  .  .  .  .
+DW DL  .  .  . DW  . DL TW  .  . DW  .  . DW
+ . DL  .  .  .  . DL DL  .  .  . DL  .  . TW
+TL TW  .  .  . DL  .  .  .  .  .  . TL  . TL
+ .  .  . DW  .  .  . TL DL  .  .  . DW  .  .
+ . DL  . DL  . DW  .  .  . DW  . DL  . DL  .
+ .  . DW  .  .  . DL TL  .  .  . DW  .  .  .
+TL  . TL  .  .  .  .  .  . DL  .  .  . TW TL
+TW  .  . DL  .  .  . DL DL  .  .  .  . DL  .
+DW  .  . DW  .  . TW DL  . DW  .  .  . DL DW
+ .  .  .  . TL  .  .  .  .  .  .  .  .  .  .
+ .  . DL  .  .  . TW  .  .  .  .  .  .  .  .
+ .  . TL  .  . DL  .  .  . DW  .  .  .  .  .
+
+Seed review-19; quality penalty 76
+ . TW DL  .  . DW  . TW  .  .  .  . DL  . TL
+ .  .  .  .  . TL  .  .  .  .  .  .  . TL  .
+DW TL TW  .  .  . TL  .  .  . DW DW  .  .  .
+ .  .  . DL DW  .  .  .  .  .  . DL  .  .  .
+ .  .  .  .  .  .  .  .  .  .  . DL  .  . DL
+TW  . DW  . DL  .  . TL  . DL  .  .  .  . DW
+ .  . DL  .  .  . DW DL  .  .  .  .  .  . DL
+ .  .  .  . DL  .  .  .  .  . DL  .  .  .  .
+DL  .  .  .  .  .  . DL DW  .  .  . DL  .  .
+DW  .  .  .  . DL  . TL  .  . DL  . DW  . TW
+DL  .  . DL  .  .  .  .  .  .  .  .  .  .  .
+ .  .  . DL  .  .  .  .  .  . DW DL  .  .  .
+ .  .  . DW DW  .  .  . TL  .  .  . TW TL DW
+ . TL  .  .  .  .  .  .  . TL  .  .  .  .  .
+TL  . DL  .  .  .  . TW  . DW  .  . DL TW  .
+
+20 boards; mean penalty 85.00; 32 ms
+Mean bonus count by 5x5 region: 6.75, 6.10, 7.60, 6.50, 6.10, 6.50, 7.60, 6.10, 6.75
+Mean word premiums within 3 of center: 3.50; mean word-premium pairs within 2: 16.50

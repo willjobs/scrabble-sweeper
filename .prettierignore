@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+test-results
+playwright-report
+src/data/dictionary.txt
+src/data/WORDLIST_CC0.txt
+docs/boards-sample.txt
