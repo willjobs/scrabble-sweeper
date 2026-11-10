@@ -4,12 +4,22 @@ import { afterEach, expect, test, vi } from "vitest";
 import { GameBoard } from "../src/components/GameBoard";
 import { createGame, getPlayerView } from "../src/engine/game";
 afterEach(cleanup);
+const zoomProps = {
+  zoom: { enlarged: false, center: null },
+  onZoomChange: vi.fn(),
+};
 test("board labels unknown squares without secret attributes; only callbacks handle staging", () => {
   const game = createGame("component", "SCORE_ONLY");
   const callback = vi.fn();
   const view = getPlayerView(game, 0);
   render(
-    <GameBoard board={view.board} selected={0} notesMode onSquare={callback} />,
+    <GameBoard
+      {...zoomProps}
+      board={view.board}
+      selected={0}
+      notesMode
+      onSquare={callback}
+    />,
   );
   const cell = screen.getByTestId("cell-0");
   expect(cell.getAttribute("aria-label")).toBe("A1, empty");
@@ -28,7 +38,14 @@ test("revealed ordinary and consumed premiums are accessible, notes distinctly l
     fresh: true,
   };
   view.board[224] = { tile: null, bonus: undefined, note: 0, fresh: false };
-  render(<GameBoard board={view.board} selected={null} onSquare={() => {}} />);
+  render(
+    <GameBoard
+      {...zoomProps}
+      board={view.board}
+      selected={null}
+      onSquare={() => {}}
+    />,
+  );
   expect(screen.getByTestId("cell-0").getAttribute("aria-label")).toContain(
     "letter A, 0 points, blank, ordinary, consumed, your note",
   );
@@ -48,6 +65,7 @@ test("notes show actual hypotheses and keep contradictory guesses distinct from 
   view.board[1] = { tile: null, note: 12, fresh: false };
   const { rerender } = render(
     <GameBoard
+      {...zoomProps}
       board={view.board}
       selected={null}
       notesMode
@@ -63,7 +81,12 @@ test("notes show actual hypotheses and keep contradictory guesses distinct from 
     "your note: TL or DW",
   );
   rerender(
-    <GameBoard board={view.board} selected={null} onSquare={() => {}} />,
+    <GameBoard
+      {...zoomProps}
+      board={view.board}
+      selected={null}
+      onSquare={() => {}}
+    />,
   );
   expect(
     screen.getByTestId("cell-0").querySelector(".tile-letter")?.textContent,

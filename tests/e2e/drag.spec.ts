@@ -120,8 +120,10 @@ test("cancelled drags, blank choices and committed tiles remain correct", async 
   await cell(page, 0).click();
   await mouseDrag(page, rack(page, "blank"), cell(page, 112));
   await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Enlarge/ })).toBeVisible();
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   await expect(cell(page, 112)).toHaveAttribute("aria-label", /empty/);
+  await expect(page.getByRole("button", { name: /Enlarge/ })).toBeVisible();
   await mouseDrag(page, rack(page, "blank"), cell(page, 112));
   await page
     .getByRole("dialog")
@@ -131,6 +133,9 @@ test("cancelled drags, blank choices and committed tiles remain correct", async 
     "aria-label",
     /letter A, 0 points, blank/,
   );
+  await expect(
+    page.getByRole("button", { name: "Fit board", exact: true }),
+  ).toBeVisible();
   await expect(cell(page, 0)).toHaveAttribute("aria-label", /empty/);
   await mouseDrag(page, cell(page, 112), cell(page, 127));
   await expect(cell(page, 127)).toHaveAttribute(
@@ -270,5 +275,65 @@ test.describe("native touch dragging", () => {
     });
     await expect(cell(page, 0)).toHaveAttribute("aria-label", /letter A/);
     await expect(rack(page, "A")).toHaveAttribute("aria-pressed", "false");
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
+    await expect(cell(page, 0)).toBeInViewport();
+    expect((await cell(page, 0).boundingBox())!.width).toBeGreaterThanOrEqual(
+      44,
+    );
   });
 });
+
+for (const width of [320, 390])
+  test(`placement zooms to its area after tapping or dropping at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await setup(page);
+    await cell(page, 158).click();
+    await expect(page.getByRole("button", { name: /Enlarge/ })).toBeVisible();
+    await rack(page, "A").click();
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
+    const frame = await center(page.locator(".board-viewport"));
+    const placed = await center(cell(page, 158));
+    expect(Math.abs(placed.x - frame.x)).toBeLessThan(4);
+    expect(Math.abs(placed.y - frame.y)).toBeLessThan(4);
+    await expect(cell(page, 159)).toBeInViewport();
+    expect((await cell(page, 158).boundingBox())!.width).toBeGreaterThanOrEqual(
+      44,
+    );
+    if (width === 390)
+      await page.screenshot({
+        path: "test-results/auto-zoom-phone.png",
+        fullPage: true,
+      });
+
+    await page.getByRole("button", { name: "Fit board", exact: true }).click();
+    await cell(page, 0).click();
+    await expect(page.getByRole("button", { name: /Enlarge/ })).toBeVisible();
+    await mouseDrag(page, rack(page, "T"), cell(page, 0), false);
+    await expect(page.locator(".drag-ghost")).toBeVisible();
+    // Changing scale during a drag would move the square out from under the finger.
+    await expect(page.getByRole("button", { name: /Enlarge/ })).toBeVisible();
+    await page.mouse.up();
+    await expect(cell(page, 0)).toHaveAttribute("aria-label", /letter T/);
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
+    await expect(cell(page, 0)).toBeInViewport();
+
+    await page.getByRole("button", { name: "Fit board", exact: true }).click();
+    await mouseDrag(page, cell(page, 0), cell(page, 224));
+    await expect(cell(page, 224)).toHaveAttribute("aria-label", /letter T/);
+    await expect(cell(page, 0)).toHaveAttribute("aria-label", /empty/);
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
+    await expect(cell(page, 224)).toBeInViewport();
+    expect((await cell(page, 224).boundingBox())!.width).toBeGreaterThanOrEqual(
+      44,
+    );
+  });

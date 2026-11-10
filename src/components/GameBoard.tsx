@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef } from "react";
 import type { MouseEventHandler, PointerEvent } from "react";
 import type { DragTile } from "../useTileDrag";
 import type { CellView } from "../engine/game";
@@ -9,6 +9,8 @@ const bonusLabel = (bonus: string) => (bonus === "NONE" ? "—" : bonus);
 
 export function GameBoard({
   board,
+  zoom,
+  onZoomChange,
   selected,
   onSquare,
   notesMode = false,
@@ -22,6 +24,8 @@ export function GameBoard({
   dragPreview = null,
 }: {
   board: (CellView & { staged?: boolean })[];
+  zoom: { enlarged: boolean; center: number | null };
+  onZoomChange: (enlarged: boolean) => void;
   selected: number | null;
   onSquare: (i: number) => void;
   notesMode?: boolean;
@@ -37,7 +41,7 @@ export function GameBoard({
   dropAllowed?: boolean;
   dragPreview?: DragTile | null;
 }) {
-  const [enlarged, setEnlarged] = useState(false);
+  const { enlarged, center } = zoom;
   const viewport = useRef<HTMLDivElement>(null);
   const focus = notesMode ? selected : cursor;
   const previous = useRef({ enlarged: false, focus });
@@ -49,7 +53,8 @@ export function GameBoard({
     previous.current = { enlarged, focus };
     if (!enlarged || (!entering && !moved) || !viewport.current) return;
     const at = entering
-      ? (focus ??
+      ? ((!notesMode ? center : null) ??
+        focus ??
         selected ??
         board.findIndex((cell) => cell.tile && cell.fresh))
       : focus;
@@ -86,7 +91,7 @@ export function GameBoard({
       if (square.bottom > bottom)
         viewport.current.scrollTop += square.bottom - bottom;
     }
-  }, [enlarged, focus, selected, board]);
+  }, [enlarged, center, focus, selected, board, notesMode]);
 
   return (
     <div
@@ -95,10 +100,7 @@ export function GameBoard({
     >
       <div className="board-view-tools">
         <span>{notesMode ? "Bonus & guess map" : "Letter board"}</span>
-        <button
-          aria-pressed={enlarged}
-          onClick={() => setEnlarged((value) => !value)}
-        >
+        <button aria-pressed={enlarged} onClick={() => onZoomChange(!enlarged)}>
           {enlarged ? "Fit board" : "Enlarge ⤢"}
         </button>
       </div>

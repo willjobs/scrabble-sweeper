@@ -230,6 +230,13 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           /letter /,
         );
         await page
+          .getByRole("button", { name: "Fit board", exact: true })
+          .waitFor();
+        assert.ok(
+          (await page.getByTestId("cell-112").boundingBox()).width >= 44,
+          "Placing a tile should automatically enlarge the board",
+        );
+        await page
           .getByRole("button", { name: /^Rack / })
           .nth(1)
           .click();

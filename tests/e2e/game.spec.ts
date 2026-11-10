@@ -529,7 +529,9 @@ for (const width of [320, 390])
         .locator(".tile-points")
         .evaluate((el) => parseFloat(getComputedStyle(el).fontSize)),
     ).toBeGreaterThanOrEqual(8);
-    await page.getByRole("button", { name: /Enlarge/ }).click();
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
     expect((await tile.boundingBox())!.width).toBeGreaterThanOrEqual(44);
     expect(
       await page.evaluate(
@@ -586,8 +588,14 @@ test("zoom follows the square selected for post-score notes", async ({
     await page
       .getByRole("button", { name: new RegExp(`^Rack ${letter},`) })
       .click();
-  await page.getByRole("button", { name: /Enlarge/ }).click();
+  await expect(
+    page.getByRole("button", { name: "Fit board", exact: true }),
+  ).toBeVisible();
   await expect(page.getByTestId("cell-113")).toBeInViewport();
+  // Pan away before scoring; selecting the receipt's first tile must bring it back.
+  await page.locator(".board-viewport").evaluate((el) => {
+    el.scrollLeft = el.scrollWidth;
+  });
   await expect(page.getByTestId("cell-107")).not.toBeInViewport();
   await page.getByRole("button", { name: "Submit word" }).click();
   await expect(

@@ -333,6 +333,10 @@ function GameScreen({
   const [cursor, setCursor] = useState<number | null>(null);
   const [direction, setDirection] = useState<"across" | "down">("across");
   const [anchor, setAnchor] = useState<number | null>(null);
+  const [boardZoom, setBoardZoom] = useState({
+    enlarged: false,
+    center: null as number | null,
+  });
   const [undoStack, setUndoStack] = useState<Placement[][]>([]);
   const changePending = (next: Placement[]) => {
     controller.clearError();
@@ -371,6 +375,7 @@ function GameScreen({
     setSelected(null);
     setAnchor(at);
     setCursor(nextSquare(at, direction, next));
+    setBoardZoom({ enlarged: true, center: at });
   };
   const placeTile = (id: string, at: number) => {
     if (busy) return;
@@ -391,6 +396,7 @@ function GameScreen({
     setSelected(null);
     setAnchor(at);
     setCursor(nextSquare(at, direction, next));
+    setBoardZoom({ enlarged: true, center: at });
   };
   const clickSquare = (at: number) => {
     if (busy) return;
@@ -506,6 +512,7 @@ function GameScreen({
             setUndoStack([]);
             setCursor(null);
             setAnchor(null);
+            setBoardZoom({ enlarged: false, center: null });
             setDirection("across");
             setSelectedCell(null);
             setSelected(null);
@@ -700,6 +707,10 @@ function GameScreen({
         <div className="board-column">
           <GameBoard
             board={board}
+            zoom={boardZoom}
+            onZoomChange={(enlarged) =>
+              setBoardZoom({ enlarged, center: null })
+            }
             onClickCapture={drag.suppressClick}
             onTilePointerDown={(event, at) => {
               const placed = pending.find((p) => p.at === at);
