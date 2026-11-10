@@ -1,4 +1,17 @@
 import { expect, test, type Page } from "@playwright/test";
+function luminance(rgb: string) {
+  const channels = rgb
+    .match(/[\d.]+/g)!
+    .slice(0, 3)
+    .map(Number)
+    .map((value) => {
+      const channel = value / 255;
+      return channel <= 0.04045
+        ? channel / 12.92
+        : ((channel + 0.055) / 1.055) ** 2.4;
+    });
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+}
 async function setup(page: Page, mode = "Score-only", blank = false) {
   await page.goto("/");
   await page.getByRole("button", { name: "New game", exact: true }).waitFor();
@@ -178,15 +191,24 @@ test("exchange and six scoreless actions finish and reveal full board", async ({
     "aria-label",
     /revealed/,
   );
-  const inks = await Promise.all(
+  const premiumColors = await Promise.all(
     ["DL", "TL", "DW", "TW"].map((bonus) =>
       page
         .locator(`.cell.has-observation[data-premium="${bonus}"]`)
         .first()
-        .evaluate((el) => getComputedStyle(el).color),
+        .evaluate((el) => ({
+          ink: getComputedStyle(el).color,
+          fill: getComputedStyle(el).backgroundColor,
+        })),
     ),
   );
-  expect(new Set(inks).size).toBe(4);
+  expect(new Set(premiumColors.map((color) => color.ink)).size).toBe(4);
+  for (const color of premiumColors) {
+    const [dark, light] = [luminance(color.ink), luminance(color.fill)].sort(
+      (a, b) => a - b,
+    );
+    expect((light + 0.05) / (dark + 0.05)).toBeGreaterThanOrEqual(4.5);
+  }
   await expect(page.getByRole("button", { name: /^Rack / })).toHaveCount(0);
   await expect(
     page.getByText(/Six consecutive scoreless turns\. Each/),
