@@ -267,6 +267,48 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           /letter /,
         );
         await fitsWindow();
+        await page.screenshot({
+          path: `${directory}/${engine}-${variant.name}-board.png`,
+          fullPage: true,
+        });
+        await page.getByRole("button", { name: "Notes", exact: true }).click();
+        await page.getByTestId("cell-0").click();
+        await page.getByRole("button", { name: "DW", exact: true }).click();
+        await page.waitForFunction(
+          () =>
+            globalThis.document
+              .querySelector('[data-testid="cell-0"]')
+              ?.getAttribute("data-premium") === "DW",
+        );
+        assert.equal(
+          await page.getByTestId("cell-224").getAttribute("data-premium"),
+          "DW",
+        );
+        assert.ok(
+          (await page.locator(".board-viewport").boundingBox()).width >= 378,
+          "Notes should retain the full phone board width",
+        );
+        assert.ok(
+          (await page.locator(".annotation-dock").boundingBox()).height <= 105,
+          "Notes should use the compact editor",
+        );
+        const premiumInks = await page
+          .locator(
+            '.quick-notes button[data-premium]:not([data-premium="NONE"])',
+          )
+          .evaluateAll((buttons) =>
+            buttons.map((button) =>
+              globalThis
+                .getComputedStyle(button)
+                .getPropertyValue("--premium-ink"),
+            ),
+          );
+        assert.equal(
+          new Set(premiumInks).size,
+          4,
+          "Each premium should have its own ink",
+        );
+        await fitsWindow();
         const origin = new URL(page.url()).origin;
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(
@@ -278,7 +320,7 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           [],
         );
         await page.screenshot({
-          path: `${directory}/${engine}-${variant.name}-board.png`,
+          path: `${directory}/${engine}-${variant.name}-notes.png`,
           fullPage: true,
         });
         results.push({ ...result, ok: true, failures });

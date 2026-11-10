@@ -146,11 +146,17 @@ export function GameBoard({
                 // Guesses get their own layer instead of competing with letters.
                 const showNote = hasNote && (notesMode || !tile);
                 const showBonus = !showNote && (notesMode || !tile) && bonus;
+                const premium = showNote
+                  ? guesses.length === 1
+                    ? guesses[0]
+                    : undefined
+                  : showBonus || undefined;
                 return (
                   <button
                     key={i}
                     data-testid={`cell-${i}`}
                     data-board-square={i}
+                    data-premium={premium}
                     aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}${cell.staged ? ", staged" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i === cursor ? `, placement cursor ${direction}` : ""}${hasNote ? `, your note: ${noteDescription}` : ""}`}
                     className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${i === cursor ? "placement-cursor" : ""} ${bonus ? "bonus-" + bonus : ""} ${showNote ? "has-guess" : ""} ${showBonus ? "has-observation" : ""} ${i === dragSource ? "drag-origin" : ""} ${i === dropTarget ? (dropAllowed ? "drop-target" : "drop-invalid") : ""}`}
                     draggable={false}
@@ -186,7 +192,9 @@ export function GameBoard({
                             </span>
                             <span className="guess-alternatives">
                               {guesses.map((b) => (
-                                <span key={b}>{bonusLabel(b)}</span>
+                                <span key={b} data-premium={b}>
+                                  {bonusLabel(b)}
+                                </span>
                               ))}
                             </span>
                           </>

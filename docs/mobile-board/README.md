@@ -1,5 +1,7 @@
 # More room for the phone board
 
+The follow-up [Notes layout and palette](../notes-board/README.md) applies the full-width treatment to Notes and introduces four premium colors.
+
 The phone layout now uses a compact identity/score header, a nearly edge-to-edge board, and one labelled action bar below the rack. Direction, Shuffle, Submit, Undo and Recall remain directly available with targets at least 44×44px. The direction arrow shows the current axis; tap it to switch. Visual order matches keyboard order. App status and individual tile removal are available in More; desktop controls retain their existing layout.
 
 Turn and bag information share the header with save status. The game mode remains in More. Eliminating the separate metadata and rack-tool rows recovers space for the board without reducing rack height or removing coordinate labels. Enlarged play and the private, post-score Notes editor remain available.

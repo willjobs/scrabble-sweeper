@@ -125,6 +125,38 @@ for (const [width, height] of windows)
       await expect(
         page.getByRole("button", { name: "More", exact: true }),
       ).toBeFocused();
+      await page.getByRole("button", { name: "Notes", exact: true }).click();
+      const emptyFrame = (await page.locator(".board-viewport").boundingBox())!;
+      await expect(
+        page.getByRole("button", { name: "DW", exact: true }),
+      ).toBeDisabled();
+      await page.getByTestId("cell-145").click();
+      expect((await page.locator(".board-viewport").boundingBox())!.width).toBe(
+        emptyFrame.width,
+      );
+      await page.getByRole("button", { name: "DW", exact: true }).click();
+      await expect(page.getByTestId("cell-145")).toHaveAttribute(
+        "data-premium",
+        "DW",
+      );
+      await page
+        .getByRole("button", { name: "Note options", exact: true })
+        .click();
+      await page
+        .getByRole("dialog", { name: "Note options" })
+        .getByRole("button", { name: "Reset to unknown", exact: true })
+        .click();
+      await expect(page.getByTestId("cell-145")).not.toHaveAttribute(
+        "data-premium",
+      );
+      await expect(
+        page.getByRole("button", { name: "Note options", exact: true }),
+      ).toBeFocused();
+      await page.getByTestId("cell-112").click();
+      await expect(
+        page.getByRole("button", { name: "TW", exact: true }),
+      ).toBeDisabled();
+      await page.getByRole("button", { name: "Play", exact: true }).click();
     }
     const rack = page.getByRole("button", { name: /^Rack / }).first();
     expect((await rack.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -159,8 +191,24 @@ for (const [width, height] of windows)
       (await page.getByTestId("cell-113").boundingBox())!.width,
     ).toBeGreaterThanOrEqual(44);
     await page.getByRole("button", { name: "Notes", exact: true }).click();
+    const beforeSelection = await page.locator(".board-viewport").boundingBox();
     await page.getByTestId("cell-113").click();
     await clearPlaySurface(page);
+    if (width <= 639) {
+      const frame = (await page.locator(".board-viewport").boundingBox())!;
+      expect(frame.width).toBeGreaterThanOrEqual(width - 12);
+      expect(frame.width).toBeCloseTo(beforeSelection!.width, 1);
+      expect(frame.y).toBeCloseTo(beforeSelection!.y, 1);
+      expect(
+        (await page.locator(".annotation-dock").boundingBox())!.height,
+      ).toBeLessThanOrEqual(105);
+      const colors = await page
+        .locator('.quick-notes button[data-premium]:not([data-premium="NONE"])')
+        .evaluateAll((buttons) =>
+          buttons.map((b) => getComputedStyle(b).backgroundColor),
+        );
+      expect(new Set(colors).size).toBe(4);
+    }
     await page.getByRole("button", { name: "TL", exact: true }).click();
     await page.getByRole("button", { name: "Play", exact: true }).click();
     await page.getByRole("button", { name: "Submit word" }).click();
@@ -168,6 +216,11 @@ for (const [width, height] of windows)
       page.getByRole("button", { name: "Pass device", exact: true }),
     ).toBeVisible();
     await clearPlaySurface(page);
+    if (width <= 639) {
+      expect(
+        (await page.locator(".board-viewport").boundingBox())!.width,
+      ).toBeGreaterThanOrEqual(width - 12);
+    }
     await page.reload();
     await expect(
       page.getByRole("button", { name: "Resume game", exact: true }),

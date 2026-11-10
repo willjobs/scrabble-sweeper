@@ -539,18 +539,6 @@ footer {
   color: #29221b;
   box-shadow: inset 0 0 0 1px #998c78;
 }
-.cell.has-observation.bonus-DL {
-  background: #d4e4e2;
-}
-.cell.has-observation.bonus-TL {
-  background: #aecac7;
-}
-.cell.has-observation.bonus-DW {
-  background: #efd8c9;
-}
-.cell.has-observation.bonus-TW {
-  background: #dbad9d;
-}
 .cell.pair-highlight,
 .notes-map .cell.pair-highlight {
   outline: 2px solid var(--red);
@@ -2428,5 +2416,223 @@ main > footer {
   }
   .game-table .annotation-dock {
     margin-top: 6px;
+  }
+}
+
+/* Shared premium inks: letters in blue/teal, words in ochre/oxblood. */
+:where([data-premium]) {
+  --premium-ink: #5e574e;
+  --premium-wash: #eee8de;
+  --premium-solid: #ded6c7;
+}
+[data-premium="DL"] {
+  --premium-ink: #355f88;
+  --premium-wash: #e2edf6;
+  --premium-solid: #c5dcec;
+}
+[data-premium="TL"] {
+  --premium-ink: #21685d;
+  --premium-wash: #deeee8;
+  --premium-solid: #bbddd0;
+}
+[data-premium="DW"] {
+  --premium-ink: #805214;
+  --premium-wash: #f7ebcf;
+  --premium-solid: #ecd397;
+}
+[data-premium="TW"] {
+  --premium-ink: #87353e;
+  --premium-wash: #f5e1e4;
+  --premium-solid: #e8bec5;
+}
+.cell.has-guess[data-premium],
+.notes-map .cell.has-guess[data-premium] {
+  background: var(--premium-wash);
+  color: var(--premium-ink);
+  box-shadow: inset 0 0 0 1px var(--premium-ink);
+}
+.cell.has-guess[data-premium]::after {
+  border-color: var(--premium-ink);
+}
+.cell.has-observation[data-premium],
+.notes-map .cell.has-observation[data-premium] {
+  background: var(--premium-solid);
+  color: var(--premium-ink);
+  box-shadow: inset 0 0 0 1px var(--premium-ink);
+}
+.guess-alternatives span[data-premium] {
+  color: var(--premium-ink);
+  background: var(--premium-wash);
+  border-radius: 2px;
+  padding: 1px;
+}
+.quick-notes button[data-premium] {
+  color: var(--premium-ink);
+  background: var(--premium-wash);
+  border-color: var(--premium-ink);
+}
+.quick-notes button[data-premium]:hover {
+  background: var(--premium-solid);
+}
+.quick-notes button[data-premium][aria-pressed="true"] {
+  color: #fffaf2;
+  background: var(--premium-ink);
+  border-color: var(--premium-ink);
+  box-shadow: inset 0 0 0 1px var(--premium-ink);
+}
+.observed-label,
+.bonus-color-key > span {
+  color: var(--premium-ink);
+  background: var(--premium-wash);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-weight: 650;
+}
+.bonus-color-key {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  font-size: 13px;
+}
+.note-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.mobile-note-context,
+.note-options-trigger,
+.multiple-short-label {
+  display: none;
+}
+.annotation-heading > div > strong {
+  font-family: var(--serif);
+}
+
+/* A steady two-row notes bar leaves the phone board nearly edge to edge. */
+@media (max-width: 639px) {
+  .game-table .annotation-dock {
+    display: grid;
+    grid-template-columns:
+      minmax(58px, 1.25fr) repeat(4, minmax(44px, 1fr))
+      44px;
+    grid-template-rows: 44px 44px;
+    gap: 3px;
+    padding: 3px 4px 4px;
+    border-top-width: 2px;
+    margin-top: 3px;
+  }
+  .annotation-heading {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+    gap: 6px;
+  }
+  .annotation-heading > div {
+    min-width: 0;
+  }
+  .annotation-heading > div > strong {
+    display: block;
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .game-table .mobile-note-context {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.3;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+  .annotation-heading .mirror-caption,
+  .desktop-note-readout {
+    display: none;
+  }
+  .game-table .note-options-trigger {
+    display: block;
+    flex-shrink: 0;
+    margin-left: auto;
+    min-width: 64px;
+    min-height: 44px;
+    padding: 4px 7px;
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+  }
+  .game-table .quick-notes,
+  .game-table .annotation-options {
+    display: contents;
+  }
+  .game-table .quick-notes button {
+    grid-row: 2;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 4px 1px;
+    font-size: 15px;
+  }
+  .game-table .quick-notes button:first-child {
+    grid-column: 1;
+    font-size: 11px;
+  }
+  .game-table .annotation-options > button {
+    display: none;
+  }
+  .game-table .multiple-notes-toggle {
+    grid-row: 2;
+    grid-column: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 44px;
+    min-height: 44px;
+    margin: 0;
+    padding: 2px;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: var(--surface);
+  }
+  .multiple-notes-toggle:has(input:checked) {
+    border-color: var(--red);
+    background: var(--blush);
+  }
+  .game-table .multiple-short-label {
+    display: block;
+    font-size: 11px;
+    line-height: 1.1;
+  }
+  .multiple-full-label,
+  .annotation-dock > .note-summary {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 639px) {
+  .game-table.phase-result .score-strip {
+    display: none;
+  }
+  .game-table .result {
+    padding: 0 0 0 8px;
+    gap: 0 8px;
+  }
+  .game-table .result h2 {
+    font-size: 22px;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .game-table .result h2 small {
+    font-size: 12px;
+  }
+  .game-table .result > p:not(.eyebrow):not(.result-invitation) {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .game-table .result-actions > button {
+    min-height: 44px;
+    margin: -1px;
   }
 }

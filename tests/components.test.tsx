@@ -24,6 +24,7 @@ test("board labels unknown squares without secret attributes; only callbacks han
   const cell = screen.getByTestId("cell-0");
   expect(cell.getAttribute("aria-label")).toBe("A1, empty");
   expect(cell.outerHTML).not.toMatch(/bonus-(?:TW|DW|TL|DL)/);
+  expect(cell.hasAttribute("data-premium")).toBe(false);
   fireEvent.click(cell);
   expect(callback).toHaveBeenCalledWith(0);
   expect(screen.getByTestId("cell-224").className).toContain("pair-highlight");
@@ -74,6 +75,8 @@ test("notes show actual hypotheses and keep contradictory guesses distinct from 
   );
   expect(screen.getByTestId("cell-0").textContent).toBe("TW");
   expect(screen.getByTestId("cell-0").className).toContain("has-guess");
+  expect(screen.getByTestId("cell-0").getAttribute("data-premium")).toBe("TW");
+  expect(screen.getByTestId("cell-1").hasAttribute("data-premium")).toBe(false);
   expect(screen.getByTestId("cell-0").getAttribute("aria-label")).toContain(
     "DL, consumed, your note: TW",
   );
@@ -97,6 +100,7 @@ test("notes show actual hypotheses and keep contradictory guesses distinct from 
   expect(
     screen.getByTestId("cell-0").querySelector(".square-guess"),
   ).toBeNull();
+  expect(screen.getByTestId("cell-0").hasAttribute("data-premium")).toBe(false);
 });
 
 test("a single click records one guess; multiple mode retains alternatives", async () => {

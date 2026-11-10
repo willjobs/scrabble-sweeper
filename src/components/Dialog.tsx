@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 export function Dialog({
   title,
   children,
@@ -9,7 +9,8 @@ export function Dialog({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
+  // Close before detaching the dialog so the browser restores its trigger's focus.
+  useLayoutEffect(() => {
     const dialog = ref.current!;
     dialog.showModal();
     return () => dialog.close();

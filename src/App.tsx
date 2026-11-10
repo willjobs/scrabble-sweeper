@@ -1082,6 +1082,11 @@ function GameScreen({
       {sheet === "more" && (
         <Dialog title="Game menu" onClose={closeSheet}>
           <p>
+            {view.names
+              .map((name, i) => `${name}: ${view.scores[i]} points`)
+              .join(" · ")}
+          </p>
+          <p>
             Turn {view.turn} · {view.bagCount} tiles in bag ·{" "}
             {view.mode === "SCORE_ONLY" ? "Score-only" : "Reveal-used"}
           </p>

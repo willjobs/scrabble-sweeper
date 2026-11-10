@@ -107,7 +107,13 @@ test("notes mirror, allow contradictions, preserve staging and stay private", as
   await expect(
     editor.getByRole("button", { name: "TL", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
-  await editor.getByRole("button", { name: "Clear hypothesis" }).click();
+  await editor
+    .getByRole("button", { name: "Note options", exact: true })
+    .click();
+  await page
+    .getByRole("dialog", { name: "Note options" })
+    .getByRole("button", { name: "Clear hypothesis" })
+    .click();
   await expect(editor).toContainText("No possibilities");
   await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect(page.getByTestId("cell-112")).toHaveAttribute(
@@ -172,6 +178,15 @@ test("exchange and six scoreless actions finish and reveal full board", async ({
     "aria-label",
     /revealed/,
   );
+  const inks = await Promise.all(
+    ["DL", "TL", "DW", "TW"].map((bonus) =>
+      page
+        .locator(`.cell.has-observation[data-premium="${bonus}"]`)
+        .first()
+        .evaluate((el) => getComputedStyle(el).color),
+    ),
+  );
+  expect(new Set(inks).size).toBe(4);
   await expect(page.getByRole("button", { name: /^Rack / })).toHaveCount(0);
   await expect(
     page.getByText(/Six consecutive scoreless turns\. Each/),
