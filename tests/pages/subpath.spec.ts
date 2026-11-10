@@ -21,18 +21,16 @@ test("Pages subpath serves production assets, scoped PWA and offline resume", as
     ).href,
   }));
   expect(new URL(links.manifest).pathname).toBe(
-    "/scrabble-sweeper/manifest.webmanifest",
+    "/tile-theory/manifest.webmanifest",
   );
-  expect(new URL(links.icon).pathname).toBe(
-    "/scrabble-sweeper/icons/icon-192.png",
-  );
+  expect(new URL(links.icon).pathname).toBe("/tile-theory/icons/icon-192.png");
   const response = await page.request.get(links.manifest);
   expect(response.ok()).toBe(true);
   const manifest = await response.json();
   expect(manifest.name).toBe("Tile Theory");
   expect(manifest.short_name).toBe("Tile Theory");
-  expect(manifest.start_url).toBe("/scrabble-sweeper/");
-  expect(manifest.scope).toBe("/scrabble-sweeper/");
+  expect(manifest.start_url).toBe("/tile-theory/");
+  expect(manifest.scope).toBe("/tile-theory/");
   for (const icon of manifest.icons) {
     expect(
       (await page.request.get(new URL(icon.src, links.manifest).href)).ok(),
@@ -41,7 +39,7 @@ test("Pages subpath serves production assets, scoped PWA and offline resume", as
   const scope = await page.evaluate(
     async () => (await navigator.serviceWorker.ready).scope,
   );
-  expect(new URL(scope).pathname).toBe("/scrabble-sweeper/");
+  expect(new URL(scope).pathname).toBe("/tile-theory/");
   await page.getByRole("button", { name: "New game", exact: true }).click();
   await expect(page.getByRole("button", { name: "Submit word" })).toBeVisible();
   await page.reload();

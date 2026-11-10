@@ -20,10 +20,10 @@ node docs/sunday-arts/capture.mjs
 Capture the actual production home pages separately (the script asserts developer controls are absent):
 
 ```sh
-BASE_PATH=/scrabble-sweeper/ npm run build
-BASE_PATH=/scrabble-sweeper/ npm run preview -- --port 4182
+BASE_PATH=/tile-theory/ npm run build
+BASE_PATH=/tile-theory/ npm run preview -- --port 4182
 # In another terminal:
-PREVIEW_URL=http://127.0.0.1:4182/scrabble-sweeper/ node docs/sunday-arts/capture.mjs --home
+PREVIEW_URL=http://127.0.0.1:4182/tile-theory/ node docs/sunday-arts/capture.mjs --home
 ```
 
 Examples: [home](screenshots/home-390.png), [resume](screenshots/resume-390.png), [board](screenshots/board-390.png), [phone notes](screenshots/notes-320.png), [enlarged notes](screenshots/enlarged-notes-390.png), [desktop notes](screenshots/notes-1280.png).
