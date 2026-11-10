@@ -1,4 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import type { MouseEventHandler, PointerEvent } from "react";
+import type { DragTile } from "../useTileDrag";
 import type { CellView } from "../engine/game";
 import { coord, mirror } from "../engine/generator";
 import { BONUSES } from "../engine/types";
@@ -12,6 +14,12 @@ export function GameBoard({
   notesMode = false,
   cursor = null,
   direction = "across",
+  onTilePointerDown,
+  onClickCapture,
+  dragSource = null,
+  dropTarget = null,
+  dropAllowed = false,
+  dragPreview = null,
 }: {
   board: (CellView & { staged?: boolean })[];
   selected: number | null;
@@ -19,6 +27,15 @@ export function GameBoard({
   notesMode?: boolean;
   cursor?: number | null;
   direction?: "across" | "down";
+  onTilePointerDown?: (
+    event: PointerEvent<HTMLButtonElement>,
+    at: number,
+  ) => void;
+  onClickCapture?: MouseEventHandler<HTMLDivElement>;
+  dragSource?: number | null;
+  dropTarget?: number | null;
+  dropAllowed?: boolean;
+  dragPreview?: DragTile | null;
 }) {
   const [enlarged, setEnlarged] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
@@ -32,7 +49,9 @@ export function GameBoard({
     previous.current = { enlarged, focus };
     if (!enlarged || (!entering && !moved) || !viewport.current) return;
     const at = entering
-      ? (focus ?? selected ?? board.findIndex((cell) => cell.fresh))
+      ? (focus ??
+        selected ??
+        board.findIndex((cell) => cell.tile && cell.fresh))
       : focus;
     const target = viewport.current.querySelector<HTMLElement>(
       `[data-testid="cell-${at === null || at < 0 ? 112 : at}"]`,
@@ -70,7 +89,10 @@ export function GameBoard({
   }, [enlarged, focus, selected, board]);
 
   return (
-    <div className={`board-wrap ${notesMode ? "notes-map" : "letter-map"}`}>
+    <div
+      className={`board-wrap ${notesMode ? "notes-map" : "letter-map"}`}
+      onClickCapture={onClickCapture}
+    >
       <div className="board-view-tools">
         <span>{notesMode ? "Bonus & guess map" : "Letter board"}</span>
         <button
@@ -126,11 +148,30 @@ export function GameBoard({
                   <button
                     key={i}
                     data-testid={`cell-${i}`}
+                    data-board-square={i}
                     aria-label={`${coord(i)}${tile ? `, letter ${tile.letter}, ${tile.value} points${tile.blank ? ", blank" : ""}${cell.staged ? ", staged" : ""}` : ", empty"}${bonus ? `, ${bonus === "NONE" ? "ordinary" : bonus}, ${tile ? "consumed" : "revealed"}` : ""}${i === cursor ? `, placement cursor ${direction}` : ""}${hasNote ? `, your note: ${noteDescription}` : ""}`}
-                    className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${i === cursor ? "placement-cursor" : ""} ${bonus ? "bonus-" + bonus : ""} ${showNote ? "has-guess" : ""} ${showBonus ? "has-observation" : ""}`}
+                    className={`cell ${tile ? "occupied" : ""} ${cell.fresh ? "fresh" : ""} ${cell.staged ? "staged-tile" : ""} ${highlight ? "pair-highlight" : ""} ${i === cursor ? "placement-cursor" : ""} ${bonus ? "bonus-" + bonus : ""} ${showNote ? "has-guess" : ""} ${showBonus ? "has-observation" : ""} ${i === dragSource ? "drag-origin" : ""} ${i === dropTarget ? (dropAllowed ? "drop-target" : "drop-invalid") : ""}`}
+                    draggable={false}
+                    onPointerDown={
+                      cell.staged && !notesMode
+                        ? (event) => onTilePointerDown?.(event, i)
+                        : undefined
+                    }
                     onClick={() => onSquare(i)}
                   >
-                    {i === cursor && !tile ? (
+                    {i === dropTarget && dropAllowed && dragPreview && !tile ? (
+                      <>
+                        <span
+                          className={`tile-letter drop-preview ${dragPreview.blank ? "blank-letter" : ""}`}
+                          aria-hidden="true"
+                        >
+                          {dragPreview.letter}
+                        </span>
+                        <sup className="tile-points" aria-hidden="true">
+                          {dragPreview.value}
+                        </sup>
+                      </>
+                    ) : i === cursor && !tile ? (
                       <span className="cursor-arrow" aria-hidden="true">
                         {direction === "across" ? "→" : "↓"}
                       </span>

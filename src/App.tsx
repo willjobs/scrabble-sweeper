@@ -8,6 +8,7 @@ import { GameBoard } from "./components/GameBoard";
 import { Dialog } from "./components/Dialog";
 import { NotesDock } from "./components/NotesDock";
 import { useAppUpdates } from "./useAppUpdates";
+import { useTileDrag } from "./useTileDrag";
 
 export default function App() {
   const state = useSyncExternalStore(
@@ -268,10 +269,11 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
         <summary>How to play & install</summary>
         <p>
           Start with a word crossing H8, the ordinary center. Tap a starting
-          square, then tap your rack letters. The cursor advances across or
-          down. All new tiles must form a connected row or column. Submit to
-          learn your turn total. Bonuses work once, on new tiles only; seven
-          tiles earn 50 extra.
+          square, then tap your rack letters, or drag letters onto the board.
+          Drag staged tiles to move them or return them to your rack. The cursor
+          advances across or down. All new tiles must form a connected row or
+          column. Submit to learn your turn total. Bonuses work once, on new
+          tiles only; seven tiles earn 50 extra.
         </p>
         <p>
           Notes are your private guesses. Opposite squares match under a
@@ -436,6 +438,29 @@ function GameScreen({
       };
     },
   );
+  const drag = useTileDrag({
+    enabled:
+      active &&
+      !notesMode &&
+      historyTurn === undefined &&
+      exchange === null &&
+      sheet === null &&
+      !busy,
+    canDrop: (id, at) =>
+      !view.board[at].tile && !pending.some((p) => p.at === at && p.id !== id),
+    isStaged: (id) => pending.some((p) => p.id === id),
+    onDrop: (id, at) => {
+      if (!pending.some((p) => p.id === id && p.at === at)) placeTile(id, at);
+    },
+    onRecall: (id) => {
+      const placed = pending.find((p) => p.id === id);
+      if (!placed) return;
+      changePending(pending.filter((p) => p.id !== id));
+      setSelected(null);
+      setAnchor(null);
+      setCursor(placed.at);
+    },
+  });
   const turnAction = async (type: "PASS" | "EXCHANGE") => {
     const ok = await controller.action(
       type === "PASS" ? { type } : { type, ids: exchange ?? [] },
@@ -675,6 +700,20 @@ function GameScreen({
         <div className="board-column">
           <GameBoard
             board={board}
+            onClickCapture={drag.suppressClick}
+            onTilePointerDown={(event, at) => {
+              const placed = pending.find((p) => p.at === at);
+              const tile = board[at].tile;
+              if (placed && tile) drag.begin(event, { id: placed.id, ...tile });
+            }}
+            dragSource={
+              drag.tile
+                ? (pending.find((p) => p.id === drag.tile!.id)?.at ?? null)
+                : null
+            }
+            dropTarget={drag.target?.kind === "board" ? drag.target.at : null}
+            dropAllowed={drag.target?.valid ?? false}
+            dragPreview={drag.tile}
             selected={
               notesMode
                 ? selectedCell
@@ -704,7 +743,7 @@ function GameScreen({
                   ? "Tap a destination to move this tile."
                   : cursor !== null
                     ? `${coord(cursor)} · tap your next rack letter (${direction}).`
-                    : "Tap a starting square, then tap your letters. H8 is ordinary."}
+                    : "Drag a tile onto the board, or tap a square then your letters. H8 is ordinary."}
           </p>
         </div>
         {canNote && notesMode && historyTurn === undefined && (
@@ -716,7 +755,11 @@ function GameScreen({
         )}
       </div>
       {active && !notesMode && historyTurn === undefined && (
-        <section className="rack-area" aria-label="Your rack">
+        <section
+          className="rack-area"
+          aria-label="Your rack"
+          onClickCapture={drag.suppressClick}
+        >
           <div className="rack-heading">
             <div className="placement-tools" aria-label="Placement controls">
               <div>
@@ -768,7 +811,10 @@ function GameScreen({
               Shuffle
             </button>
           </div>
-          <div className="rack">
+          <div
+            className={`rack ${drag.target?.kind === "rack" && drag.target.valid ? "rack-drop-target" : ""}`}
+            data-drop-rack
+          >
             {rack.map((t) => {
               const staged = pending.some((p) => p.id === t.id);
               return (
@@ -778,7 +824,18 @@ function GameScreen({
                   aria-pressed={
                     exchange ? exchange.includes(t.id) : selected === t.id
                   }
-                  className={`rack-tile ${staged ? "staged" : ""}`}
+                  className={`rack-tile ${staged ? "staged" : ""} ${drag.tile?.id === t.id ? "drag-origin" : ""}`}
+                  draggable={false}
+                  onPointerDown={(event) =>
+                    drag.begin(event, {
+                      id: t.id,
+                      letter:
+                        pending.find((p) => p.id === t.id)?.blankAs ??
+                        (t.kind === "BLANK" ? "◇" : t.kind),
+                      value: t.value,
+                      blank: t.kind === "BLANK",
+                    })
+                  }
                   onClick={() => {
                     if (exchange)
                       setExchange((ids) =>
@@ -1012,6 +1069,7 @@ function GameScreen({
           <button onClick={closeSheet}>Keep playing</button>
         </Dialog>
       )}
+      {active && !notesMode && historyTurn === undefined && drag.overlay}
     </>
   );
 }

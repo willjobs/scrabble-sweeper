@@ -1,25 +1,25 @@
 # Implementation status
 
-The playable MVP is implemented locally in the supplied repository. Physical iPhone acceptance remains open; automated browser evidence uses system Chromium on Linux, not Safari. Nothing is deployed. Repository origin: https://github.com/willjobs/scrabble-sweeper, working branch `work`; changes are local commits.
+The game is deployed at https://willjobs.com/tile-theory/ from https://github.com/willjobs/tile-theory. Physical iPhone acceptance remains open; automated touch evidence uses Chromium on Linux, not Safari. Published builds are also checked in desktop Chromium and Firefox.
 
 ## Feature acceptance
 
-| Group                                                           | Status and evidence                                                                                                                                                               |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rules, unique tiles, blanks, crosswords, scoring, bingo         | Implemented; deterministic unit fixtures, including blank intersections and old bonus consumption                                                                                 |
-| Pass/exchange, scoreless streak, rack-out, negative finals/ties | Implemented; engine fixtures and full six-scoreless-turn browser completion                                                                                                       |
-| Symmetric balanced seeded layout                                | Implemented; 1,000 seeds tested; independent layout/bag streams; bounded candidate search; 20 sample boards and descriptive statistics                                            |
-| Score-only and reveal-used                                      | Implemented; whitelisted projections; mode comparison test; no provisional/per-word score fields                                                                                  |
-| Private mirrored notes, contradictions, center lock             | Implemented; persistent board-side editor, single/multiple guesses, immediate saves, pair highlighting, two-player separation, endgame comparison/inspection                      |
-| Receipt → explicit handoff → acknowledged next player           | Implemented; mover can annotate after scoring; next player’s rack/notes remain absent; handoff locks notes immediately                                                            |
-| Historical reconstruction and discoveries                       | Implemented; read-only selected-turn board, new-tile highlighting, no private rack/notes or future discovery; staging survives history                                            |
-| Responsive portrait interaction and accessibility               | Implemented; 320/390px layout checks, 44px rack height, semantic labels, focus/dialog keyboard support; axe scan covers setup/live/notes                                          |
-| Offline PWA and persistence                                     | Implemented; precached dictionary/assets, manifest/icons, IndexedDB transactions, safe resume gate, failure warnings/export; offline reload then dictionary-validated move tested |
-| Developer fixtures                                              | Seeded layout, opening/blank racks, board export/stats and pure-engine edge-state fixtures. No interactive full-state inspector or arbitrary board editor                         |
-| Docs and licensing                                              | MIT original code; CC0 bundled dictionary with verified upstream license, hashes, normalization and limitations; playtest protocol and install/run instructions                   |
-| Physical iPhone Safari/Home Screen/lifecycle                    | **Unverified**: installation, notch/home-indicator safe areas, VoiceOver, screen lock and real-device memory/generation latency                                                   |
-| Service-worker upgrades / prior-version migrations              | Cache generated/versioned by Workbox; incompatible saves rejected with export/reset. No migration implementation; real update/lifecycle acceptance **unverified**                 |
-| Exploratory playtesting                                         | Protocol supplied; no human playtest sessions conducted                                                                                                                           |
+| Group                                                           | Status and evidence                                                                                                                                                                      |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rules, unique tiles, blanks, crosswords, scoring, bingo         | Implemented; deterministic unit fixtures, including blank intersections and old bonus consumption                                                                                        |
+| Pass/exchange, scoreless streak, rack-out, negative finals/ties | Implemented; engine fixtures and full six-scoreless-turn browser completion                                                                                                              |
+| Symmetric balanced seeded layout                                | Implemented; 1,000 seeds tested; independent layout/bag streams; bounded candidate search; 20 sample boards and descriptive statistics                                                   |
+| Score-only and reveal-used                                      | Implemented; whitelisted projections; mode comparison test; no provisional/per-word score fields                                                                                         |
+| Private mirrored notes, contradictions, center lock             | Implemented; persistent board-side editor, single/multiple guesses, immediate saves, pair highlighting, two-player separation, endgame comparison/inspection                             |
+| Receipt → explicit handoff → acknowledged next player           | Implemented; mover can annotate after scoring; next player’s rack/notes remain absent; handoff locks notes immediately                                                                   |
+| Historical reconstruction and discoveries                       | Implemented; read-only selected-turn board, new-tile highlighting, no private rack/notes or future discovery; staging survives history                                                   |
+| Responsive portrait interaction and accessibility               | Implemented; 320/390px layout checks, 44px rack height, semantic labels, focus/dialog keyboard support; axe scan covers setup/live/notes                                                 |
+| Offline PWA and persistence                                     | Implemented; precached dictionary/assets, manifest/icons, IndexedDB transactions, safe resume gate, failure warnings/export; offline reload then dictionary-validated move tested        |
+| Developer fixtures                                              | Seeded layout, opening/blank racks, board export/stats and pure-engine edge-state fixtures. No interactive full-state inspector or arbitrary board editor                                |
+| Docs and licensing                                              | MIT original code; CC0 bundled dictionary with verified upstream license, hashes, normalization and limitations; playtest protocol and install/run instructions                          |
+| Physical iPhone Safari/Home Screen/lifecycle                    | **Unverified**: installation, notch/home-indicator safe areas, VoiceOver, screen lock and real-device memory/generation latency                                                          |
+| Service-worker upgrades / prior-version migrations              | Consent-based update prompt, stale-bundle recovery, exact-scope cache reset and two-tab update tests; saved games retained. Incompatible saves rejected with export/reset; no migrations |
+| Exploratory playtesting                                         | Protocol supplied; no human playtest sessions conducted                                                                                                                                  |
 
 ## Spec test-ID mapping
 
@@ -49,7 +49,7 @@ Tests group related requirements instead of creating a file per ID. This table d
 
 Toolchain existed before feature work. The repo pre-commit hook runs `npm run check`: ESLint → strict TypeScript → all Vitest tests → all Playwright tests (including a production-style PWA build with fixture tools explicitly enabled). No hook bypasses.
 
-Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **23 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
+Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **28 flows**, including five mouse/touch drag flows and three Pages/update flows. Drag coverage includes mixed tap/drag placement, blanks, moves, rack returns, undo/recall, occupied drops, cancellation, committed tiles, enlarged-board panning and page scrolling. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
 
 ## Screenshots
 

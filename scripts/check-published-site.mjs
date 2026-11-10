@@ -204,11 +204,22 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           await page.getByRole("button", { name: /^Rack / }).count(),
           7,
         );
-        await page.getByTestId("cell-112").click();
-        await page
-          .getByRole("button", { name: /^Rack / })
-          .first()
-          .click();
+        const firstTile = page.getByRole("button", { name: /^Rack / }).first();
+        await firstTile.scrollIntoViewIfNeeded();
+        const source = await firstTile.boundingBox();
+        const destination = await page.getByTestId("cell-112").boundingBox();
+        assert.ok(source && destination, "Missing drag source or destination");
+        await page.mouse.move(
+          source.x + source.width / 2,
+          source.y + source.height / 2,
+        );
+        await page.mouse.down();
+        await page.mouse.move(
+          destination.x + destination.width / 2,
+          destination.y + destination.height / 2,
+          { steps: 12 },
+        );
+        await page.mouse.up();
         if (await page.getByRole("dialog").count())
           await page
             .getByRole("dialog")
@@ -216,6 +227,19 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
             .click();
         assert.match(
           await page.getByTestId("cell-112").getAttribute("aria-label"),
+          /letter /,
+        );
+        await page
+          .getByRole("button", { name: /^Rack / })
+          .nth(1)
+          .click();
+        if (await page.getByRole("dialog").count())
+          await page
+            .getByRole("dialog")
+            .getByRole("button", { name: "A", exact: true })
+            .click();
+        assert.match(
+          await page.getByTestId("cell-113").getAttribute("aria-label"),
           /letter /,
         );
         const origin = new URL(page.url()).origin;
