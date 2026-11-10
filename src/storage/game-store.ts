@@ -125,6 +125,7 @@ export function restoreGame(raw: unknown): Game {
     throw Error("Saved board does not match its history.");
   return game;
 }
+// Keep the original database name so the rebrand retains existing local games.
 const database = () =>
   openDB("veiled-words", 1, {
     upgrade(db) {

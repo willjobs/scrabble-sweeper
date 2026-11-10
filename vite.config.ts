@@ -9,11 +9,11 @@ export default defineConfig({
     VitePWA({
       registerType: "prompt",
       manifest: {
-        name: "Veiled Words",
-        short_name: "Veiled",
+        name: "Tile Theory",
+        short_name: "Tile Theory",
         description: "A game of words, symmetry and hidden bonuses.",
-        theme_color: "#123d36",
-        background_color: "#f6f2e8",
+        theme_color: "#f7f1e7",
+        background_color: "#f7f1e7",
         display: "standalone",
         start_url: base,
         scope: base,
@@ -23,7 +23,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
         maximumFileSizeToCacheInBytes: 5000000,
       },
     }),

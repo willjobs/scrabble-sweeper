@@ -228,6 +228,18 @@ test("Phone boards fit and desktop keeps rack and Submit in view", async ({
     .getByRole("region", { name: "Your rack" })
     .boundingBox();
   expect(rack!.y).toBeLessThan(submit!.y);
+  await page.getByRole("button", { name: "Notes", exact: true }).click();
+  const notesBoard = (await page
+    .getByRole("group", { name: "Word board, 15 rows and 15 columns" })
+    .boundingBox())!;
+  const dock = (await page
+    .getByRole("region", { name: "Private notes" })
+    .boundingBox())!;
+  const square = (await page.getByTestId("cell-0").boundingBox())!;
+  expect(notesBoard.width).toBeGreaterThanOrEqual(320);
+  expect(Math.abs(notesBoard.width - notesBoard.height)).toBeLessThan(1);
+  expect(Math.abs(square.width - square.height)).toBeLessThan(1);
+  expect(dock.x).toBeGreaterThan(notesBoard.x + notesBoard.width);
 });
 test("storage failures warn without claiming the move was saved", async ({
   page,

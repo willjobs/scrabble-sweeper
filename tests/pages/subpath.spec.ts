@@ -7,7 +7,7 @@ test("Pages subpath serves production assets, scoped PWA and offline resume", as
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("./");
   await expect(
-    page.getByRole("heading", { name: "Veiled Words" }),
+    page.getByRole("heading", { name: "Tile Theory" }),
   ).toBeVisible();
   await expect(
     page.getByText("Developer fixtures", { exact: true }),
@@ -29,6 +29,8 @@ test("Pages subpath serves production assets, scoped PWA and offline resume", as
   const response = await page.request.get(links.manifest);
   expect(response.ok()).toBe(true);
   const manifest = await response.json();
+  expect(manifest.name).toBe("Tile Theory");
+  expect(manifest.short_name).toBe("Tile Theory");
   expect(manifest.start_url).toBe("/scrabble-sweeper/");
   expect(manifest.scope).toBe("/scrabble-sweeper/");
   for (const icon of manifest.icons) {

@@ -203,7 +203,7 @@ export const controller = {
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = "veiled-words-save.json";
+    a.download = "tile-theory-save.json";
     a.click();
     URL.revokeObjectURL(url);
   },

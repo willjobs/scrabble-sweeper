@@ -1,0 +1,42 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="512"
+  height="512"
+  viewBox="0 0 192 192"
+>
+  <rect width="192" height="192" rx="34" fill="#f7f1e7" />
+  <g transform="rotate(-8 96 96)">
+    <rect x="29" y="30" width="136" height="140" rx="13" fill="#422924" />
+    <rect
+      x="26"
+      y="24"
+      width="136"
+      height="140"
+      rx="13"
+      fill="#782c2d"
+      stroke="#4d2623"
+      stroke-width="3"
+    />
+    <rect
+      x="34"
+      y="32"
+      width="120"
+      height="124"
+      rx="7"
+      fill="none"
+      stroke="#c59a70"
+      stroke-width="1.5"
+    />
+    <text
+      x="94"
+      y="133"
+      text-anchor="middle"
+      font-family="Georgia, 'Times New Roman', serif"
+      font-size="119"
+      font-weight="700"
+      fill="#fff3d8"
+    >
+      T
+    </text>
+  </g>
+</svg>

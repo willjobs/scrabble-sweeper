@@ -34,11 +34,11 @@ export default function App() {
     <main className={state.view ? "playing" : "home"}>
       <header className="masthead">
         <div className="brand-mark" aria-hidden="true">
-          V<span>?</span>
+          T
         </div>
         <div>
-          <h1>Veiled Words</h1>
-          <p>The word game with a secret.</p>
+          <h1>Tile Theory</h1>
+          <p>A game of words & deduction.</p>
         </div>
       </header>
       <div className="save-status" role="status">
@@ -72,8 +72,8 @@ export default function App() {
         ))}
       <footer>
         {state.view
-          ? "Make a word. Find your edge."
-          : "Two players. One device. Endless plot twists."}
+          ? "Every word builds a theory."
+          : "A little wordplay. A little deduction."}
       </footer>
     </main>
   );
@@ -85,19 +85,25 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
   const [fixture, setFixture] = useState("");
   const [confirm, setConfirm] = useState(false);
   const begin = () => void controller.newGame(names, mode, seed, fixture);
+  const newGameButton = (
+    <button
+      className={`primary full new-start ${hasSave ? "with-save" : ""}`}
+      disabled={busy}
+      onClick={() => (hasSave ? setConfirm(true) : begin())}
+    >
+      New game
+    </button>
+  );
   return (
     <section className="setup">
       <div className="game-cover">
-        <div className="cover-label">
-          <span aria-hidden="true">✦</span> A LITTLE WORDPLAY. A BIG TWIST.
-        </div>
+        <div className="cover-label">A PASS-AND-PLAY WORD GAME</div>
         <h2>
           Good words.
           <br />
           <em>Sneaky bonuses.</em>
         </h2>
         <div className="cover-art" aria-hidden="true">
-          <span className="orbit-spark spark-one">✦</span>
           <div className="cover-board">
             {Array.from({ length: 30 }, (_, i) => {
               const letters: Record<number, string> = {
@@ -121,8 +127,6 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
             })}
           </div>
           <span className="floating-secret">?</span>
-          <span className="orbit-spark spark-two">✦</span>
-          <span className="art-sticker">Expect the unexpected.</span>
         </div>
         <p>
           Play your words. Uncover hidden bonuses.
@@ -139,8 +143,9 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           Resume game
         </button>
       )}
+      {!hasSave && newGameButton}
       <fieldset>
-        <legend>Pick your kind of mystery</legend>
+        <legend>Pick your mode</legend>
         <label
           className={`mode-choice ${mode === "SCORE_ONLY" ? "chosen" : ""}`}
         >
@@ -155,7 +160,7 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           </span>
           <span>
             <strong>Score-only</strong>
-            <small>Follow the scores. Trust your hunch.</small>
+            <small>Bonuses stay hidden.</small>
           </span>
         </label>
         <label
@@ -172,7 +177,7 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           </span>
           <span>
             <strong>Reveal-used</strong>
-            <small>Play a tile. Reveal its bonus.</small>
+            <small>Reveal played bonuses.</small>
           </span>
         </label>
       </fieldset>
@@ -195,13 +200,7 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           ))}
         </div>
       </details>
-      <button
-        className={`primary full new-start ${hasSave ? "with-save" : ""}`}
-        disabled={busy}
-        onClick={() => (hasSave ? setConfirm(true) : begin())}
-      >
-        <span aria-hidden="true" className="play-arrow" /> New game
-      </button>
+      {hasSave && newGameButton}
       {DEV_TOOLS && (
         <details className="dev">
           <summary>Developer fixtures</summary>

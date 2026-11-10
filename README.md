@@ -1,4 +1,4 @@
-# Veiled Words
+# Tile Theory
 
 A complete local, two-person, pass-and-play word game with a hidden, randomly generated bonus board. React + strict TypeScript + Vite; pure deterministic game engine; IndexedDB saves; offline PWA. No accounts, backend, analytics, solver or network dictionary.
 

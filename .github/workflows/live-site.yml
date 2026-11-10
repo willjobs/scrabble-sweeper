@@ -1,9 +1,6 @@
 name: Check published site
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [.github/workflows/live-site.yml]
   workflow_run:
     workflows: [Deploy GitHub Pages]
     types: [completed]
@@ -30,7 +27,7 @@ jobs:
             return response;
           }
           const page=await get(address),html=await page.text();
-          assert.match(html,/<title>Veiled Words<\/title>/);
+          assert.match(html,/<title>Tile Theory<\/title>/);
           const script=html.match(/<script[^>]+src="([^"]*\/assets\/[^" ]+\.js)"/);
           assert.ok(script,'Missing application bundle');
           const bundle=await get(new URL(script[1],address));
