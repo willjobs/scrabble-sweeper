@@ -24,6 +24,7 @@ jobs:
       - name: Verify published HTML and rendered gameplay
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          EXPECTED_BUILD: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: node scripts/check-published-site.mjs
       - uses: actions/upload-artifact@v4
         if: always()

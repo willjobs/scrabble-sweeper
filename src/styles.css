@@ -1528,3 +1528,52 @@ dialog p {
     transform: none;
   }
 }
+
+.update-notice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  margin: 10px 0;
+  padding: 12px;
+  border: 1px solid var(--brass);
+  border-radius: 6px;
+  background: #f2e6cc;
+  font-size: 12px;
+}
+.update-notice button {
+  font-size: 12px;
+}
+.app-status {
+  font:
+    11px/1.5 -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  margin-top: 8px;
+}
+.app-status summary {
+  min-height: 32px;
+  font-weight: 450;
+}
+.app-status button {
+  font-size: 11px;
+  min-height: 36px;
+  padding: 6px 9px;
+}
+.app-status p {
+  margin: 6px 0;
+}
+.update-notice > strong,
+.update-notice > p {
+  grid-column: 1;
+}
+.update-notice > p {
+  margin: 0;
+  font-size: 11px;
+}
+.update-notice > button {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  white-space: nowrap;
+}

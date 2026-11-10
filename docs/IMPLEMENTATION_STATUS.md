@@ -49,7 +49,7 @@ Tests group related requirements instead of creating a file per ID. This table d
 
 Toolchain existed before feature work. The repo pre-commit hook runs `npm run check`: ESLint → strict TypeScript → all Vitest tests → all Playwright tests (including a production-style PWA build with fixture tools explicitly enabled). No hook bypasses.
 
-Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **21 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
+Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **23 flows**. Final counts and command results are recorded in `TEST_REPORT.md` after final validation. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
 
 ## Screenshots
 

@@ -31,6 +31,15 @@ test("Pages subpath serves production assets, scoped PWA and offline resume", as
   expect(manifest.short_name).toBe("Tile Theory");
   expect(manifest.start_url).toBe("/tile-theory/");
   expect(manifest.scope).toBe("/tile-theory/");
+  const build = await page
+    .locator('meta[name="app-build"]')
+    .getAttribute("content");
+  expect(build).toBeTruthy();
+  expect(
+    await page.evaluate(() => document.documentElement.dataset.appBuild),
+  ).toBe(build);
+  const version = await (await page.request.get("version.json")).json();
+  expect(version.build).toBe(build);
   for (const icon of manifest.icons) {
     expect(
       (await page.request.get(new URL(icon.src, links.manifest).href)).ok(),

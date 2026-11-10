@@ -23,7 +23,163 @@
     <title>Tile Theory</title>
   </head>
   <body>
-    <div id="root"></div>
+    <style>
+      .startup,
+      .load-recovery {
+        max-width: 440px;
+        margin: 12vh auto;
+        padding: 24px;
+        color: #292420;
+        background: #f7f1e7;
+        font:
+          16px/1.5 system-ui,
+          sans-serif;
+      }
+      .startup h1,
+      .load-recovery h1 {
+        font:
+          italic 700 38px Georgia,
+          serif;
+      }
+      .load-recovery[hidden] {
+        display: none;
+      }
+      .load-recovery button {
+        background: #782c2d;
+        color: #fffaf2;
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 18px;
+        font: inherit;
+        cursor: pointer;
+      }
+    </style>
+    <div id="root">
+      <main class="startup">
+        <h1>Tile Theory</h1>
+        <p>Opening your game…</p>
+      </main>
+    </div>
+    <section
+      id="load-recovery"
+      class="load-recovery"
+      aria-labelledby="recovery-title"
+      hidden
+    >
+      <h1 id="recovery-title">Tile Theory</h1>
+      <p>
+        The game couldn’t finish loading. Refresh the app to try the latest
+        files.
+      </p>
+      <p>Your saved game will be kept.</p>
+      <button id="refresh-app" type="button">Refresh app</button>
+      <p id="recovery-status" role="status"></p>
+    </section>
+    <script>
+      (() => {
+        const root = document.getElementById("root");
+        const recovery = document.getElementById("load-recovery");
+        const button = document.getElementById("refresh-app");
+        const status = document.getElementById("recovery-status");
+        let ready = false;
+        const showFailure = () => {
+          if (!ready) {
+            root.hidden = true;
+            recovery.hidden = false;
+          }
+        };
+        const timeout = setTimeout(showFailure, 12000);
+        window.addEventListener(
+          "tile-theory:ready",
+          () => {
+            ready = true;
+            clearTimeout(timeout);
+            root.hidden = false;
+            recovery.hidden = true;
+          },
+          { once: true },
+        );
+        window.addEventListener(
+          "error",
+          (event) => {
+            if (
+              event.target instanceof HTMLScriptElement &&
+              event.target.type === "module"
+            )
+              showFailure();
+          },
+          true,
+        );
+        // This code stays in the HTML so it works even when the main bundle fails.
+        window.tileTheoryReload = async () => {
+          button.disabled = true;
+          status.textContent = "Checking the latest game files…";
+          try {
+            if (!navigator.onLine) throw new Error("offline");
+            const fresh = new URL(location.href);
+            fresh.searchParams.set("refresh", Date.now().toString());
+            const response = await fetch(fresh, { cache: "no-store" });
+            const html = new DOMParser().parseFromString(
+              await response.text(),
+              "text/html",
+            );
+            const entry = html
+              .querySelector('script[type="module"][src]')
+              ?.getAttribute("src");
+            if (
+              !response.ok ||
+              !entry ||
+              !new URL(entry, response.url).pathname.includes("/assets/")
+            )
+              throw new Error("not ready");
+            const bundle = await fetch(new URL(entry, response.url), {
+              method: "HEAD",
+              cache: "no-store",
+            });
+            if (
+              !bundle.ok ||
+              !bundle.headers.get("content-type")?.includes("javascript")
+            )
+              throw new Error("not ready");
+            status.textContent = "Refreshing game files…";
+            const base = "%BASE_URL%";
+            const path = base.includes("%")
+              ? location.pathname
+                  .replace(/index\.html$/, "")
+                  .replace(/\/?$/, "/")
+              : base;
+            const scope = new URL(path, location.origin).href;
+            if ("serviceWorker" in navigator) {
+              const registrations =
+                await navigator.serviceWorker.getRegistrations();
+              await Promise.all(
+                registrations
+                  .filter((item) => item.scope === scope)
+                  .map((item) => item.unregister()),
+              );
+            }
+            if ("caches" in window) {
+              const names = await caches.keys();
+              await Promise.all(
+                names
+                  .filter(
+                    (name) =>
+                      name.startsWith("workbox-") && name.endsWith(scope),
+                  )
+                  .map((name) => caches.delete(name)),
+              );
+            }
+            location.replace(fresh.href);
+          } catch {
+            status.textContent =
+              "The latest files couldn’t be reached yet. Check your connection and try again shortly. Your saved game is kept.";
+            recovery.hidden = false;
+            button.disabled = false;
+          }
+        };
+        button.addEventListener("click", () => void window.tileTheoryReload());
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -7,6 +7,7 @@ import { coord, mirror } from "./engine/generator";
 import { GameBoard } from "./components/GameBoard";
 import { Dialog } from "./components/Dialog";
 import { NotesDock } from "./components/NotesDock";
+import { useAppUpdates } from "./useAppUpdates";
 
 export default function App() {
   const state = useSyncExternalStore(
@@ -14,7 +15,10 @@ export default function App() {
     controller.getSnapshot,
   );
   const [online, setOnline] = useState(navigator.onLine);
+  const updates = useAppUpdates();
+  const canReload = !state.busy && (!state.view || state.saved);
   useEffect(() => {
+    window.dispatchEvent(new Event("tile-theory:ready"));
     void controller.initialize();
     let warmFrame = 0;
     const paintFrame = requestAnimationFrame(() => {
@@ -51,6 +55,22 @@ export default function App() {
               ? "Loading saved game…"
               : "Two players · One device"}
       </div>
+      {(updates.available || updates.loadFailure) && (
+        <aside className="update-notice" role="status">
+          <strong>
+            {updates.loadFailure
+              ? "Some game files couldn’t load."
+              : "A new version is ready."}
+          </strong>
+          <p>
+            Saved turns and notes are kept. Unsubmitted tiles will be recalled.
+          </p>
+          <button disabled={!canReload} onClick={() => void updates.reload()}>
+            Reload & update
+          </button>
+          {!canReload && <p>Wait for your game to save before reloading.</p>}
+        </aside>
+      )}
       {state.warning && (
         <aside role="alert" className="warning">
           {state.warning}
@@ -74,6 +94,29 @@ export default function App() {
         {state.view
           ? "Every word builds a theory."
           : "A little wordplay. A little deduction."}
+        <details className="app-status">
+          <summary>App status & updates</summary>
+          <p>
+            Build {__APP_BUILD__.slice(0, 7)} · {online ? "Online" : "Offline"}
+          </p>
+          <button
+            disabled={updates.checking}
+            onClick={() => void updates.check()}
+          >
+            {updates.checking ? "Checking…" : "Check for updates"}
+          </button>{" "}
+          <button
+            disabled={!canReload || !online}
+            onClick={() => void window.tileTheoryReload()}
+          >
+            Refresh app
+          </button>
+          <p>
+            {updates.status ||
+              "Refreshing keeps saved games. Unsubmitted tiles will be recalled."}
+          </p>
+          {!canReload && <p>Wait for your game to save before refreshing.</p>}
+        </details>
       </footer>
     </main>
   );

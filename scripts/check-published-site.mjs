@@ -43,6 +43,7 @@ const variants = [
   { name: "fresh", url: fresh.href },
 ];
 const results = [];
+const expectedBuild = process.env.EXPECTED_BUILD;
 const cacheHeaders = (headers) =>
   Object.fromEntries(
     [
@@ -61,6 +62,14 @@ const compiled = (html) => {
     "Unbuilt source HTML was served",
   );
   assert.match(html, /<title>Tile Theory<\/title>/);
+  const build = html.match(/<meta[^>]+name="app-build"[^>]+content="([^"]+)"/);
+  assert.ok(build, "Missing published build identifier");
+  if (expectedBuild)
+    assert.equal(
+      build[1],
+      expectedBuild,
+      "Stale HTML: published build differs from this deployment",
+    );
   const bundle = html.match(/<script[^>]+src=["']([^"']*\/assets\/[^"']+\.js)/);
   assert.ok(bundle, "Missing application bundle");
   return bundle[1];
@@ -100,6 +109,15 @@ for (const variant of variants) {
       for (const icon of manifest.icons)
         await asset(new URL(icon.src, manifestURL));
       await asset(new URL("sw.js", response.url));
+      const versionURL = new URL("version.json", response.url);
+      versionURL.searchParams.set("check", expectedBuild || "current");
+      const version = await (await asset(versionURL)).json();
+      if (expectedBuild)
+        assert.equal(
+          version.build,
+          expectedBuild,
+          "Stale published version file",
+        );
     }
     results.push({ ...result, ok: true });
   } catch (error) {
@@ -164,6 +182,13 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
         await page
           .getByRole("heading", { name: "Tile Theory", exact: true })
           .waitFor({ timeout: 20000 });
+        if (expectedBuild) {
+          await page.waitForFunction(
+            (build) =>
+              globalThis.document.documentElement.dataset.appBuild === build,
+            expectedBuild,
+          );
+        }
         await page.screenshot({
           path: `${directory}/${engine}-${variant.name}-home.png`,
           fullPage: true,

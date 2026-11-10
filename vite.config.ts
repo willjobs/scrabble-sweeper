@@ -2,9 +2,30 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 const base = process.env.BASE_PATH || "/";
+const build = process.env.APP_BUILD_ID || process.env.GITHUB_SHA || "local";
 export default defineConfig({
   base,
+  define: { __APP_BUILD__: JSON.stringify(build) },
   plugins: [
+    {
+      name: "app-build",
+      transformIndexHtml: {
+        handler: () => [
+          {
+            tag: "meta",
+            attrs: { name: "app-build", content: build },
+            injectTo: "head",
+          },
+        ],
+      },
+      generateBundle() {
+        this.emitFile({
+          type: "asset",
+          fileName: "version.json",
+          source: JSON.stringify({ build }),
+        });
+      },
+    },
     react(),
     VitePWA({
       registerType: "prompt",
