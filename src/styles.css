@@ -2285,3 +2285,148 @@ main > footer {
     font-size: 10px;
   }
 }
+
+/* Phone play gives the grid the width and height that belong to it. */
+.mobile-game-meta,
+.mobile-tool,
+.action-icon {
+  display: none;
+}
+@media (max-width: 639px) {
+  main.playing {
+    padding: calc(4px + env(safe-area-inset-top)) 4px
+      calc(4px + env(safe-area-inset-bottom));
+  }
+  .playing .masthead {
+    min-height: 28px;
+    padding: 0 130px 1px 4px;
+    gap: 6px;
+  }
+  .playing .masthead h1 {
+    font-size: 20px;
+    letter-spacing: -0.8px;
+  }
+  .playing .brand-mark {
+    width: 22px;
+    height: 24px;
+    font-size: 20px;
+  }
+  .playing .save-status {
+    top: calc(5px + env(safe-area-inset-top));
+    right: 8px;
+    width: 125px;
+    font-size: 9px;
+    line-height: 1.3;
+  }
+  .playing .mobile-game-meta {
+    display: block;
+    font-size: 10px;
+    color: var(--ink);
+  }
+  .playing:has(.game-table) .app-status-launcher {
+    display: none;
+  }
+  .playing:not(:has(.game-table)) .save-status {
+    right: 48px;
+  }
+  .game-table {
+    gap: 3px;
+    padding-top: 3px;
+  }
+  .game-table .turn-line {
+    display: none;
+  }
+  .game-table .score-strip {
+    gap: 6px;
+  }
+  .game-table .score-strip > div {
+    min-height: 44px;
+    padding: 3px 6px;
+    border-radius: 7px;
+  }
+  .game-table .score-strip .current-player {
+    padding: 2px 5px;
+  }
+  .game-table .player-number {
+    width: 20px;
+    height: 24px;
+    font-size: 14px;
+  }
+  .game-table .score-strip strong {
+    font-size: 26px;
+  }
+  .game-table .toolbar {
+    padding-inline: 2px;
+  }
+  .game-table .rack-heading {
+    display: none;
+  }
+  .game-table .rack-area {
+    border: 0;
+    padding: 0;
+  }
+  .game-table .rack {
+    width: 100%;
+    margin: 0 0 4px;
+    padding-bottom: 4px;
+    border-bottom-width: 2px;
+    gap: 4px;
+  }
+  .game-table .rack-tile {
+    height: 52px;
+    font-size: 29px;
+  }
+  .game-table .action-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+  .game-table .action-row > button:not(.primary) {
+    flex: 0 0 44px;
+    width: 44px;
+    min-height: 44px;
+    padding: 3px 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+  }
+  .game-table .action-row .action-icon {
+    display: block;
+    width: 21px;
+    height: 21px;
+  }
+  .game-table .action-row .direction-action {
+    order: 1;
+  }
+  .game-table .action-row .shuffle-action {
+    order: 2;
+  }
+  .game-table .action-row .undo-action {
+    order: 4;
+  }
+  .game-table .action-row .recall-action {
+    order: 5;
+  }
+  .game-table .action-row .primary {
+    order: 3;
+    min-width: 0;
+    min-height: 44px;
+    padding: 6px;
+    font-size: 14px;
+  }
+  .game-table .action-row > button:not(.primary):not(:disabled):hover {
+    background: var(--blush);
+  }
+  .game-table .annotation-dock {
+    margin-top: 6px;
+  }
+}

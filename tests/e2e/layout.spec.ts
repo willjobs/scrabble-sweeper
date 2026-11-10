@@ -7,6 +7,7 @@ const windows = [
   [768, 1024],
   [390, 844],
   [390, 667],
+  [393, 635],
   [320, 568],
   [844, 390],
 ];
@@ -101,6 +102,30 @@ for (const [width, height] of windows)
       page.getByRole("button", { name: "Submit word" }),
     ).toBeVisible();
     await clearPlaySurface(page);
+    if (width <= 639) {
+      expect(
+        (await page.locator(".board").boundingBox())!.width,
+      ).toBeGreaterThanOrEqual(width - 24);
+      for (const button of await page.locator(".action-row button").all()) {
+        if (!(await button.isVisible())) continue;
+        const box = (await button.boundingBox())!;
+        expect(box.width).toBeGreaterThanOrEqual(44);
+        expect(box.height).toBeGreaterThanOrEqual(44);
+      }
+    }
+    if (width === 393) {
+      await page.getByRole("button", { name: "More", exact: true }).click();
+      await page
+        .getByRole("button", { name: "App status & updates", exact: true })
+        .click();
+      await expect(
+        page.getByRole("dialog", { name: "App status & updates" }),
+      ).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(
+        page.getByRole("button", { name: "More", exact: true }),
+      ).toBeFocused();
+    }
     const rack = page.getByRole("button", { name: /^Rack / }).first();
     expect((await rack.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await page.getByTestId("cell-112").click();
@@ -109,6 +134,26 @@ for (const [width, height] of windows)
     await expect(
       page.getByRole("button", { name: "Fit board", exact: true }),
     ).toBeVisible();
+    if (width === 393) {
+      await page.getByTestId("cell-112").click();
+      await page.getByRole("button", { name: "More", exact: true }).click();
+      await page
+        .getByRole("button", { name: "Remove tile", exact: true })
+        .click();
+      await expect(page.getByTestId("cell-112")).toHaveAttribute(
+        "aria-label",
+        /empty/,
+      );
+      await expect(page.getByTestId("cell-113")).toHaveAttribute(
+        "aria-label",
+        /letter T/,
+      );
+      await page.getByRole("button", { name: "Undo", exact: true }).click();
+      await expect(page.getByTestId("cell-112")).toHaveAttribute(
+        "aria-label",
+        /letter A/,
+      );
+    }
     await clearPlaySurface(page);
     expect(
       (await page.getByTestId("cell-113").boundingBox())!.width,

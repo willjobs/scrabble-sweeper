@@ -454,7 +454,9 @@ for (const mode of ["Score-only", "Reveal-used"])
       "aria-label",
       /placement cursor across/,
     );
-    await page.getByRole("button", { name: "Down ↓", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Direction: Across →", exact: true })
+      .click();
     await page.getByRole("button", { name: /^Rack T,/ }).click();
     await expect(page.getByTestId("cell-127")).toHaveAttribute(
       "aria-label",
@@ -466,7 +468,9 @@ for (const mode of ["Score-only", "Reveal-used"])
       /empty/,
     );
     await page.getByRole("button", { name: "Recall", exact: true }).click();
-    await page.getByRole("button", { name: "Across →", exact: true }).click();
+    await page
+      .getByRole("button", { name: "Direction: Down ↓", exact: true })
+      .click();
     await page.getByTestId("cell-112").click();
     await page.getByRole("button", { name: /^Rack A,/ }).click();
     await page.getByRole("button", { name: /^Rack T,/ }).click();

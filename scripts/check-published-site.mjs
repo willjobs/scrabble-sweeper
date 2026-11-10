@@ -217,6 +217,10 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           await page.getByRole("button", { name: /^Rack / }).count(),
           7,
         );
+        assert.ok(
+          (await page.locator(".board").boundingBox()).width >= 366,
+          "The phone grid should use nearly the full window width",
+        );
         const firstTile = page.getByRole("button", { name: /^Rack / }).first();
         await firstTile.scrollIntoViewIfNeeded();
         const source = await firstTile.boundingBox();

@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { controller, DEV_TOOLS } from "./controller";
 import type { Mode, Placement, Player } from "./engine/types";
 import { BONUSES } from "./engine/types";
@@ -10,6 +10,36 @@ import { NotesDock } from "./components/NotesDock";
 import { useAppUpdates } from "./useAppUpdates";
 import { useTileDrag } from "./useTileDrag";
 
+function ActionIcon({
+  kind,
+}: {
+  kind: "across" | "down" | "shuffle" | "undo" | "recall";
+}) {
+  const paths = {
+    across: "M4 12h16m-6-6 6 6-6 6",
+    down: "M12 4v16m-6-6 6 6 6-6",
+    shuffle:
+      "M3 6h3c5 0 7 12 12 12h3m-4-4 4 4-4 4M3 18h3c2 0 3-2 4-4m4-4c1-2 2-4 4-4h3m-4-4 4 4-4 4",
+    undo: "M8 7H3V2m0 5c5-6 17-3 17 5v7",
+    recall: "M12 3v12m-5-5 5 5 5-5M4 15v6h16v-6",
+  };
+  return (
+    <svg
+      className="action-icon"
+      aria-hidden="true"
+      focusable="false"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d={paths[kind]} />
+    </svg>
+  );
+}
+
 export default function App() {
   const state = useSyncExternalStore(
     controller.subscribe,
@@ -17,6 +47,11 @@ export default function App() {
   );
   const [online, setOnline] = useState(navigator.onLine);
   const [statusOpen, setStatusOpen] = useState(false);
+  const statusReturnFocus = useRef<HTMLElement | null>(null);
+  const openStatus = (returnFocus: HTMLElement) => {
+    statusReturnFocus.current = returnFocus;
+    setStatusOpen(true);
+  };
   const updates = useAppUpdates();
   const canReload = !state.busy && (!state.view || state.saved);
   useEffect(() => {
@@ -48,14 +83,21 @@ export default function App() {
         </div>
       </header>
       <div className="save-status" role="status">
-        {!online ? "Offline · " : ""}
-        {state.busy
-          ? "Saving…"
-          : state.saved
-            ? "Saved on this device"
-            : state.loading
-              ? "Loading saved game…"
-              : "Two players · One device"}
+        <span className="save-label">
+          {!online ? "Offline · " : ""}
+          {state.busy
+            ? "Saving…"
+            : state.saved
+              ? "Saved on this device"
+              : state.loading
+                ? "Loading saved game…"
+                : "Two players · One device"}
+        </span>
+        {state.view && (
+          <span className="mobile-game-meta">
+            Turn {state.view.turn} · {state.view.bagCount} tiles in bag
+          </span>
+        )}
       </div>
       {(updates.available || updates.loadFailure) && (
         <aside className="update-notice" role="status">
@@ -88,7 +130,12 @@ export default function App() {
       )}
       {!state.loading &&
         (state.view ? (
-          <GameScreen view={state.view} busy={state.busy} saved={state.saved} />
+          <GameScreen
+            view={state.view}
+            busy={state.busy}
+            saved={state.saved}
+            onAppStatus={openStatus}
+          />
         ) : (
           <Setup hasSave={state.hasSave} busy={state.busy} />
         ))}
@@ -102,7 +149,7 @@ export default function App() {
           className="app-status-launcher"
           aria-label="App status & updates"
           title="App status & updates"
-          onClick={() => setStatusOpen(true)}
+          onClick={(event) => openStatus(event.currentTarget)}
         >
           <span aria-hidden="true">ⓘ</span>
         </button>
@@ -110,7 +157,10 @@ export default function App() {
       {statusOpen && (
         <Dialog
           title="App status & updates"
-          onClose={() => setStatusOpen(false)}
+          onClose={() => {
+            setStatusOpen(false);
+            requestAnimationFrame(() => statusReturnFocus.current?.focus());
+          }}
         >
           <div className="app-status">
             <p>
@@ -353,11 +403,14 @@ function GameScreen({
   view,
   busy,
   saved,
+  onAppStatus,
 }: {
   view: PlayerView;
   busy: boolean;
   saved: boolean;
+  onAppStatus: (returnFocus: HTMLElement) => void;
 }) {
+  const moreTrigger = useRef<HTMLButtonElement>(null);
   const [pending, setPending] = useState<Placement[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [selectedCell, setSelectedCell] = useState<number | null>(null);
@@ -403,6 +456,16 @@ function GameScreen({
     return null;
   };
   const displayed = controller.view(historyTurn, compare) ?? view;
+  const changeDirection = (axis: typeof direction) => {
+    setDirection(axis);
+    if (anchor !== null) setCursor(nextSquare(anchor, axis, pending));
+  };
+  const shuffleRack = () =>
+    setRackOrder(
+      [...view.rack]
+        .sort(() => crypto.getRandomValues(new Uint8Array(1))[0] / 255 - 0.5)
+        .map((t) => t.id),
+    );
   const rack = rackOrder.length
     ? [...view.rack].sort(
         (a, b) => rackOrder.indexOf(a.id) - rackOrder.indexOf(b.id),
@@ -717,7 +780,11 @@ function GameScreen({
           <span className="history-label">History</span>{" "}
           <span>{view.history.length}</span>
         </button>
-        <button className="more-trigger" onClick={() => setSheet("more")}>
+        <button
+          ref={moreTrigger}
+          className="more-trigger"
+          onClick={() => setSheet("more")}
+        >
           More
         </button>
         <button
@@ -845,21 +912,13 @@ function GameScreen({
               <div>
                 <button
                   aria-pressed={direction === "across"}
-                  onClick={() => {
-                    setDirection("across");
-                    if (anchor !== null)
-                      setCursor(nextSquare(anchor, "across", pending));
-                  }}
+                  onClick={() => changeDirection("across")}
                 >
                   Across →
                 </button>
                 <button
                   aria-pressed={direction === "down"}
-                  onClick={() => {
-                    setDirection("down");
-                    if (anchor !== null)
-                      setCursor(nextSquare(anchor, "down", pending));
-                  }}
+                  onClick={() => changeDirection("down")}
                 >
                   Down ↓
                 </button>
@@ -875,21 +934,7 @@ function GameScreen({
                 </button>
               )}
             </div>
-            <button
-              onClick={() =>
-                setRackOrder(
-                  [...view.rack]
-                    .sort(
-                      () =>
-                        crypto.getRandomValues(new Uint8Array(1))[0] / 255 -
-                        0.5,
-                    )
-                    .map((t) => t.id),
-                )
-              }
-            >
-              Shuffle
-            </button>
+            <button onClick={shuffleRack}>Shuffle</button>
           </div>
           <div
             className={`rack ${drag.target?.kind === "rack" && drag.target.valid ? "rack-drop-target" : ""}`}
@@ -953,6 +998,24 @@ function GameScreen({
             <>
               <div className="action-row">
                 <button
+                  className="mobile-tool direction-action"
+                  aria-label={`Direction: ${direction === "across" ? "Across →" : "Down ↓"}`}
+                  title="Tap to change placement direction"
+                  onClick={() =>
+                    changeDirection(direction === "across" ? "down" : "across")
+                  }
+                >
+                  <ActionIcon kind={direction} />
+                  <span>{direction === "across" ? "Across" : "Down"}</span>
+                </button>
+                <button
+                  className="mobile-tool shuffle-action"
+                  onClick={shuffleRack}
+                >
+                  <ActionIcon kind="shuffle" />
+                  <span>Shuffle</span>
+                </button>
+                <button
                   className="primary"
                   disabled={busy || !pending.length}
                   onClick={async () => {
@@ -979,6 +1042,7 @@ function GameScreen({
                   Submit word
                 </button>
                 <button
+                  className="undo-action"
                   disabled={!undoStack.length || busy}
                   onClick={() => {
                     controller.clearError();
@@ -989,9 +1053,11 @@ function GameScreen({
                     setAnchor(null);
                   }}
                 >
-                  Undo
+                  <ActionIcon kind="undo" />
+                  <span>Undo</span>
                 </button>
                 <button
+                  className="recall-action"
                   disabled={!pending.length || busy}
                   onClick={() => {
                     changePending([]);
@@ -1000,7 +1066,8 @@ function GameScreen({
                     setSelected(null);
                   }}
                 >
-                  Recall
+                  <ActionIcon kind="recall" />
+                  <span>Recall</span>
                 </button>
               </div>
             </>
@@ -1019,6 +1086,17 @@ function GameScreen({
             {view.mode === "SCORE_ONLY" ? "Score-only" : "Reveal-used"}
           </p>
           <div className="game-menu-actions">
+            {selected && pending.some((p) => p.id === selected) && (
+              <button
+                onClick={() => {
+                  changePending(pending.filter((p) => p.id !== selected));
+                  setSelected(null);
+                  closeSheet();
+                }}
+              >
+                Remove tile
+              </button>
+            )}
             {active && historyTurn === undefined && (
               <>
                 <button
@@ -1042,6 +1120,14 @@ function GameScreen({
               </>
             )}
             <button onClick={() => setSheet("new")}>Home / New game</button>
+            <button
+              onClick={() => {
+                closeSheet();
+                onAppStatus(moreTrigger.current!);
+              }}
+            >
+              App status & updates
+            </button>
           </div>
           <p>
             Drag or tap to place tiles. Tap a staged tile to move it or remove

@@ -1,5 +1,7 @@
 # One window, one game
 
+The subsequent [phone board refinement](../mobile-board/README.md) expands the grid further and updates the phone controls; captures below document the initial window-fit pass.
+
 The home page and game now use the available window height. Desktop uses an editorial cover and setup column; gameplay gives the board a large left-hand surface and a right-hand control rail. Portrait stacks the scores, board, rack and primary actions. Landscape phones use the side rail too.
 
 The portrait board uses CSS container dimensions to take the space remaining after the controls and the private Notes editor. Its enlarged tiles remain at least 44px across. Coordinate labels no longer impose a hidden minimum height on the fitted board; the grid stays square at small sizes. Letters are centered in their tile faces.
