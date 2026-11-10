@@ -19,7 +19,7 @@ For a physical phone on a trusted LAN, use the host's LAN address and an HTTPS s
 
 ## Play
 
-1. Choose names and Score-only or Reveal-used. A new game confirms before replacing a saved game.
+1. Choose Score-only or Reveal-used. Who’s playing? opens optional player names. A new game confirms before replacing a saved game.
 2. Drag rack letters onto empty squares with a finger or mouse, or tap a starting square then tap rack letters: the cursor advances automatically. Placing a tile automatically enlarges the board around that square, after the drop or tap finishes. Fit board restores the overview; the next placement zooms in again. Choose Across/Down to change direction. Tile-first placement also works. First word covers ordinary H8. All new tiles share a row/column and connect to the crossword. Drag a staged tile to another square or back to the rack; tapping a staged tile then its destination also works. Drag near an enlarged board's edges to pan, or near the screen's top/bottom to scroll. Occupied/outside drops leave tiles in place; Escape cancels a drag. Undo reverses the last staging change; Recall takes back the whole pending word. A blank opens an A–Z picker.
 3. Submit validates every word. Only the committed turn total is shown. Letter/word bonuses apply to newly placed tiles only; seven tiles add 50. No preview scores are supplied.
 4. Read the score receipt, tap **Pass device**, physically hand over, then the next player acknowledges their identity. Their private rack and notes do not mount before acknowledgement. The mover can keep annotating after seeing the score, until Pass device is tapped; that tap immediately locks their notes.
@@ -27,7 +27,7 @@ For a physical phone on a trusted LAN, use the host's LAN address and an HTTPS s
 6. History reconstructs each selected turn, highlighting its new tiles and revealing only discoveries available then. Return to live board preserves staging.
 7. Six scoreless turns, or emptying a rack with an empty bag, ends the game. Final rack deductions/transfer occur once. The full layout is revealed automatically; compare either player's notes using the selector and square inspection.
 
-Pass/exchange require recalling pending placements. Exchange needs at least seven tiles in the bag and draws replacements before recycling. New game configuration is fixed. Offline play works after the first successful service-worker cache installation; the whole dictionary is bundled. Committed actions and notes auto-save. Reload → Resume always enters a privacy gate. Pending placements and rack display order are deliberately not saved.
+Open More for Pass, Exchange and Home / New game. Pass/exchange require recalling pending placements. Exchange needs at least seven tiles in the bag and draws replacements before recycling. New game configuration is fixed. Offline play works after the first successful service-worker cache installation; the whole dictionary is bundled. Committed actions and notes auto-save. Reload → Resume always enters a privacy gate. Pending placements and rack display order are deliberately not saved.
 
 ## Checks and commits
 
@@ -71,8 +71,14 @@ For a local production build matching Pages, run `BASE_PATH=/tile-theory/ npm ru
 
 ## App updates and stale files
 
-The game offers **App status & updates** in its footer, including the build ID, a manual update check and a safe refresh. A waiting service worker announces a new version; the player chooses when to reload. Updating in another tab does not reload a tab with a pending move. Refresh buttons wait for the committed game to be saved; unsubmitted tiles are recalled. Recovery clears only this game's Workbox caches and service worker registration, never IndexedDB or other apps' caches. It first checks that the latest HTML and application bundle are reachable, so an offline refresh does not erase the offline app.
+The ⓘ button in the header opens **App status & updates**, including the build ID, a manual update check and a safe refresh. A waiting service worker announces a new version; the player chooses when to reload. Updating in another tab does not reload a tab with a pending move. Refresh buttons wait for the committed game to be saved; unsubmitted tiles are recalled. Recovery clears only this game's Workbox caches and service worker registration, never IndexedDB or other apps' caches. It first checks that the latest HTML and application bundle are reachable, so an offline refresh does not erase the offline app.
 
 If the entry bundle cannot load, a small recovery screen in the HTML provides **Refresh app**, independent of React and its JavaScript bundle. This replaces an unexplained blank page with an explicit retry path. Every build includes its ID in HTML, JavaScript and `version.json`; live Chromium/Firefox checks require the exact deployed commit, rather than accepting any older working build.
 
 GitHub Pages controls its own HTTP cache headers (currently a ten-minute lifetime). Repository files cannot override those headers. Cloudflare currently passes HTML through (`DYNAMIC`); keep HTML, `sw.js` and `version.json` out of any future Cache Everything rules. Content-hashed files under `assets/` may be cached long-term. Saved games stay in the same origin's IndexedDB across updates.
+
+## A game that fits the window
+
+Home uses an editorial two-column layout on desktop and a compact illustrated cover on phones. Gameplay keeps the board, scores, rack and primary actions together: a side rail on desktop/landscape phones, and a height-aware stack in portrait. The portrait board measures its remaining space after the controls and Notes editor, preserving square cells and 44px rack/bonus buttons. Enlarge still pans inside the board; it does not require scrolling the page. Letter faces are centered at both scales.
+
+Help, player names, history and app status open in keyboard-accessible sheets. More contains infrequent turn actions; post-score notes remain available until Pass device. The responsive checks cover eight windows from 320×568 to 1440×900, including 844×390 landscape, with page overflow and collision assertions. Screenshots and iteration notes are in [docs/window-layout/README.md](docs/window-layout/README.md).

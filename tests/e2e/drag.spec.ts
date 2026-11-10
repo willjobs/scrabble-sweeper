@@ -12,6 +12,7 @@ async function setup(page: Page, blank = false) {
   await page
     .getByLabel("Starting rack")
     .selectOption(blank ? "blank" : "opening");
+  await page.getByText("Developer fixtures", { exact: true }).click();
   await page.getByRole("button", { name: "New game", exact: true }).click();
   await expect(page.getByRole("button", { name: "Submit word" })).toBeVisible();
 }
@@ -257,7 +258,7 @@ test.describe("native touch dragging", () => {
     ).toBeVisible();
     await expect(page.getByRole("button", { name: /^Rack / })).toHaveCount(0);
   });
-  test("a held tile scrolls the page to reach the top of the board", async ({
+  test("touch placement reaches the board without scrolling the page", async ({
     page,
     context,
   }) => {
@@ -265,9 +266,7 @@ test.describe("native touch dragging", () => {
     await setup(page);
     const client = await context.newCDPSession(page);
     await touchStart(page, client, rack(page, "A"));
-    expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0);
-    await touchMove(client, { x: 100, y: 4 });
-    await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+    expect(await page.evaluate(() => scrollY)).toBe(0);
     await touchMove(client, await center(cell(page, 0)));
     await client.send("Input.dispatchTouchEvent", {
       type: "touchEnd",

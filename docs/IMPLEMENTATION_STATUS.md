@@ -49,7 +49,7 @@ Tests group related requirements instead of creating a file per ID. This table d
 
 Toolchain existed before feature work. The repo pre-commit hook runs `npm run check`: ESLint → strict TypeScript → all Vitest tests → all Playwright tests (including a production-style PWA build with fixture tools explicitly enabled). No hook bypasses.
 
-Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **30 flows**, including seven mouse/touch drag and auto-zoom flows and three Pages/update flows. Drag coverage includes mixed tap/drag placement, blanks, moves, rack returns, undo/recall, occupied drops, cancellation, committed tiles, enlarged-board panning and page scrolling. Automatic placement zoom is checked at 320/390px, including overview controls, edge squares and keeping the scale steady during a drag. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
+Current unit/component suite: **54 tests** in five files, including the 1,000-seed generator run. Browser suite: **38 flows**, including seven mouse/touch drag and auto-zoom flows, eight viewport/overlap flows and three Pages/update flows. Drag coverage includes mixed tap/drag placement, blanks, moves, rack returns, undo/recall, occupied drops, cancellation, committed tiles, enlarged-board panning and page scrolling. Automatic placement zoom is checked at 320/390px, including overview controls, edge squares and keeping the scale steady during a drag. `npm run test:coverage` measures core engine/storage coverage; do not interpret it as device coverage.
 
 ## Screenshots
 

@@ -8,6 +8,7 @@ async function setup(page: Page, mode = "Score-only", blank = false) {
   await page
     .getByLabel("Starting rack")
     .selectOption(blank ? "blank" : "opening");
+  await page.getByText("Developer fixtures", { exact: true }).click();
   await page.getByRole("radio", { name: new RegExp(mode) }).check();
   await page.getByRole("button", { name: "New game", exact: true }).click();
   await expect(page.getByRole("button", { name: "Submit word" })).toBeVisible();
@@ -150,12 +151,14 @@ test("exchange and six scoreless actions finish and reveal full board", async ({
   page,
 }) => {
   await setup(page);
+  await page.getByRole("button", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Exchange", exact: true }).click();
   await page.getByRole("button", { name: /^Rack A,/ }).click();
   await page.getByRole("button", { name: "Confirm exchange (1)" }).click();
   await page.getByRole("button", { name: "Exchange and end turn" }).click();
   await handoff(page);
   for (let i = 1; i < 6; i++) {
+    await page.getByRole("button", { name: "More", exact: true }).click();
     await page.getByRole("button", { name: "Pass", exact: true }).click();
     await page.getByRole("button", { name: "Confirm pass" }).click();
     if (i < 5) await handoff(page, i % 2 === 1 ? "Player 1" : "Player 2");
@@ -173,6 +176,20 @@ test("exchange and six scoreless actions finish and reveal full board", async ({
   await expect(
     page.getByText(/Six consecutive scoreless turns\. Each/),
   ).toBeVisible();
+  for (const [width, height] of [
+    [320, 568],
+    [844, 390],
+  ]) {
+    await page.setViewportSize({ width, height });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollHeight <= innerHeight + 1,
+      ),
+    ).toBe(true);
+    const board = (await page.locator(".board-viewport").boundingBox())!;
+    expect(board.width).toBeGreaterThan(140);
+    expect(board.y + board.height).toBeLessThanOrEqual(height);
+  }
 });
 test("offline cache includes dictionary, saves and resumes after offline reload", async ({
   page,
@@ -363,6 +380,7 @@ test("storage failure export recovers the newest in-memory turn and Home reports
       throw new DOMException("Disk full", "QuotaExceededError");
     };
   });
+  await page.getByRole("button", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Pass", exact: true }).click();
   await page.getByRole("button", { name: "Confirm pass" }).click();
   await expect(page.getByRole("alert")).toContainText("could not save");
@@ -373,6 +391,7 @@ test("storage failure export recovers the newest in-memory turn and Home reports
   );
   expect(data.turn).toBe(2);
   expect(data.moves.at(-1).type).toBe("PASS");
+  await page.getByRole("button", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Home / New game" }).click();
   await expect(page.getByRole("dialog")).toContainText("in memory");
   await expect(page.getByRole("dialog")).not.toContainText("game is saved");
@@ -383,12 +402,16 @@ test("320px blank picker, note labels and long-name handoff fit their controls",
 }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.goto("/");
-  await page.locator(".players-options summary").click();
+  await page
+    .getByRole("button", { name: "Who’s playing?", exact: true })
+    .click();
   await page
     .getByLabel("Player 2", { exact: true })
     .fill("MaximilianTheMysteryWordMaster");
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await page.getByText("Developer fixtures", { exact: true }).click();
   await page.getByLabel("Starting rack").selectOption("blank");
+  await page.getByText("Developer fixtures", { exact: true }).click();
   await page.getByRole("button", { name: "New game", exact: true }).click();
   await place(page, "blank", 112);
   const dialog = page.getByRole("dialog");
@@ -408,6 +431,7 @@ test("320px blank picker, note labels and long-name handoff fit their controls",
     .evaluate((el) => el.scrollWidth <= el.clientWidth);
   expect(fitsText).toBe(true);
   await page.getByRole("button", { name: "Play", exact: true }).click();
+  await page.getByRole("button", { name: "More", exact: true }).click();
   await page.getByRole("button", { name: "Pass", exact: true }).click();
   await page.getByRole("button", { name: "Confirm pass" }).click();
   await page.getByRole("button", { name: "Pass device", exact: true }).click();
@@ -488,6 +512,7 @@ for (const mode of ["Score-only", "Reveal-used"])
       editor.getByRole("button", { name: "TL", exact: true }),
     ).toHaveAttribute("aria-pressed", "false");
     await page.getByRole("button", { name: "Play", exact: true }).click();
+    await page.getByRole("button", { name: "More", exact: true }).click();
     await page.getByRole("button", { name: "Pass", exact: true }).click();
     await page.getByRole("button", { name: "Confirm pass" }).click();
     await handoff(page, "Player 1");

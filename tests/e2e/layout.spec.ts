@@ -1,0 +1,138 @@
+import { expect, test, type Page } from "@playwright/test";
+
+const windows = [
+  [1280, 800],
+  [1440, 900],
+  [1024, 768],
+  [768, 1024],
+  [390, 844],
+  [390, 667],
+  [320, 568],
+  [844, 390],
+];
+
+async function fitsWindow(page: Page) {
+  const overflow = await page.evaluate(() => ({
+    x: document.documentElement.scrollWidth - innerWidth,
+    y: document.documentElement.scrollHeight - innerHeight,
+  }));
+  expect(overflow.x).toBeLessThanOrEqual(1);
+  expect(overflow.y).toBeLessThanOrEqual(1);
+}
+
+async function clearPlaySurface(page: Page) {
+  await fitsWindow(page);
+  const issues = await page.evaluate(() => {
+    const board = document
+      .querySelector(".board-viewport")!
+      .getBoundingClientRect();
+    const problems: string[] = [];
+    if (
+      board.width < 120 ||
+      board.height < 120 ||
+      board.y < 0 ||
+      board.bottom > innerHeight + 1
+    )
+      problems.push("board is too small or outside the window");
+    for (const selector of [
+      ".score-strip",
+      ".toolbar",
+      ".rack-area",
+      ".annotation-dock",
+      ".result",
+    ]) {
+      const el = document.querySelector(selector);
+      if (!el || !el.getClientRects().length) continue;
+      const r = el.getBoundingClientRect();
+      if (
+        Math.min(r.right, board.right) - Math.max(r.left, board.left) > 1 &&
+        Math.min(r.bottom, board.bottom) - Math.max(r.top, board.top) > 1
+      )
+        problems.push(`${selector} overlaps the board`);
+      if (r.bottom > innerHeight + 1 || r.y < 0 || r.right > innerWidth + 1)
+        problems.push(`${selector} is outside the window`);
+    }
+    return problems;
+  });
+  expect(issues).toEqual([]);
+}
+
+for (const [width, height] of windows)
+  test(`home and game fit ${width}×${height} without collisions`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height });
+    await page.goto("/");
+    const start = page.getByRole("button", { name: "New game", exact: true });
+    await expect(start).toBeVisible();
+    await fitsWindow(page);
+    expect(
+      await page.evaluate(() => {
+        const box = (s: string) =>
+          document.querySelector(s)!.getBoundingClientRect();
+        const cover = box(".game-cover"),
+          controls = box(".setup-controls");
+        const separate =
+          Math.min(cover.right, controls.right) -
+            Math.max(cover.left, controls.left) <=
+            1 ||
+          Math.min(cover.bottom, controls.bottom) -
+            Math.max(cover.top, controls.top) <=
+            1;
+        return (
+          separate &&
+          box(".masthead").bottom <= Math.min(cover.top, controls.top) + 1 &&
+          Math.max(cover.bottom, controls.bottom) <= box("footer").top + 1
+        );
+      }),
+    ).toBe(true);
+    await page
+      .getByRole("button", { name: "Who’s playing?", exact: true })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "Who’s playing?" }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await page.getByText("Developer fixtures", { exact: true }).click();
+    await page.getByLabel("Starting rack").selectOption("opening");
+    await page.getByText("Developer fixtures", { exact: true }).click();
+    await start.click();
+    await expect(
+      page.getByRole("button", { name: "Submit word" }),
+    ).toBeVisible();
+    await clearPlaySurface(page);
+    const rack = page.getByRole("button", { name: /^Rack / }).first();
+    expect((await rack.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+    await page.getByTestId("cell-112").click();
+    await page.getByRole("button", { name: /^Rack A,/ }).click();
+    await page.getByRole("button", { name: /^Rack T,/ }).click();
+    await expect(
+      page.getByRole("button", { name: "Fit board", exact: true }),
+    ).toBeVisible();
+    await clearPlaySurface(page);
+    expect(
+      (await page.getByTestId("cell-113").boundingBox())!.width,
+    ).toBeGreaterThanOrEqual(44);
+    await page.getByRole("button", { name: "Notes", exact: true }).click();
+    await page.getByTestId("cell-113").click();
+    await clearPlaySurface(page);
+    await page.getByRole("button", { name: "TL", exact: true }).click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
+    await page.getByRole("button", { name: "Submit word" }).click();
+    await expect(
+      page.getByRole("button", { name: "Pass device", exact: true }),
+    ).toBeVisible();
+    await clearPlaySurface(page);
+    await page.reload();
+    await expect(
+      page.getByRole("button", { name: "Resume game", exact: true }),
+    ).toBeVisible();
+    await fitsWindow(page);
+    await page
+      .getByRole("button", { name: "App status & updates", exact: true })
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: "App status & updates" }),
+    ).toBeVisible();
+    await fitsWindow(page);
+  });

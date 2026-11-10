@@ -16,6 +16,7 @@ export default function App() {
     controller.getSnapshot,
   );
   const [online, setOnline] = useState(navigator.onLine);
+  const [statusOpen, setStatusOpen] = useState(false);
   const updates = useAppUpdates();
   const canReload = !state.busy && (!state.view || state.saved);
   useEffect(() => {
@@ -92,33 +93,50 @@ export default function App() {
           <Setup hasSave={state.hasSave} busy={state.busy} />
         ))}
       <footer>
-        {state.view
-          ? "Every word builds a theory."
-          : "A little wordplay. A little deduction."}
-        <details className="app-status">
-          <summary>App status & updates</summary>
-          <p>
-            Build {__APP_BUILD__.slice(0, 7)} · {online ? "Online" : "Offline"}
-          </p>
-          <button
-            disabled={updates.checking}
-            onClick={() => void updates.check()}
-          >
-            {updates.checking ? "Checking…" : "Check for updates"}
-          </button>{" "}
-          <button
-            disabled={!canReload || !online}
-            onClick={() => void window.tileTheoryReload()}
-          >
-            Refresh app
-          </button>
-          <p>
-            {updates.status ||
-              "Refreshing keeps saved games. Unsubmitted tiles will be recalled."}
-          </p>
-          {!canReload && <p>Wait for your game to save before refreshing.</p>}
-        </details>
+        <span>
+          {state.view
+            ? "Every word builds a theory."
+            : "A little wordplay. A little deduction."}
+        </span>
+        <button
+          className="app-status-launcher"
+          aria-label="App status & updates"
+          title="App status & updates"
+          onClick={() => setStatusOpen(true)}
+        >
+          <span aria-hidden="true">ⓘ</span>
+        </button>
       </footer>
+      {statusOpen && (
+        <Dialog
+          title="App status & updates"
+          onClose={() => setStatusOpen(false)}
+        >
+          <div className="app-status">
+            <p>
+              Build {__APP_BUILD__.slice(0, 7)} ·{" "}
+              {online ? "Online" : "Offline"}
+            </p>
+            <button
+              disabled={updates.checking}
+              onClick={() => void updates.check()}
+            >
+              {updates.checking ? "Checking…" : "Check for updates"}
+            </button>{" "}
+            <button
+              disabled={!canReload || !online}
+              onClick={() => void window.tileTheoryReload()}
+            >
+              Refresh app
+            </button>
+            <p>
+              {updates.status ||
+                "Refreshing keeps saved games. Unsubmitted tiles will be recalled."}
+            </p>
+            {!canReload && <p>Wait for your game to save before refreshing.</p>}
+          </div>
+        </Dialog>
+      )}
     </main>
   );
 }
@@ -128,6 +146,7 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
   const [seed, setSeed] = useState("");
   const [fixture, setFixture] = useState("");
   const [confirm, setConfirm] = useState(false);
+  const [options, setOptions] = useState<"players" | "help" | null>(null);
   const begin = () => void controller.newGame(names, mode, seed, fixture);
   const newGameButton = (
     <button
@@ -178,73 +197,95 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           Keep your next move a little mysterious.
         </p>
       </div>
-      {hasSave && (
-        <button
-          className="primary full"
-          onClick={() => void controller.resume()}
-          disabled={busy}
-        >
-          Resume game
-        </button>
-      )}
-      {!hasSave && newGameButton}
-      <fieldset>
-        <legend>Pick your mode</legend>
-        <label
-          className={`mode-choice ${mode === "SCORE_ONLY" ? "chosen" : ""}`}
-        >
-          <input
-            type="radio"
-            name="reveal"
-            checked={mode === "SCORE_ONLY"}
-            onChange={() => setMode("SCORE_ONLY")}
-          />
-          <span className="mode-icon" aria-hidden="true">
-            ?
-          </span>
-          <span>
-            <strong>Score-only</strong>
-            <small>Bonuses stay hidden.</small>
-          </span>
-        </label>
-        <label
-          className={`mode-choice ${mode === "REVEAL_USED" ? "chosen" : ""}`}
-        >
-          <input
-            type="radio"
-            name="reveal"
-            checked={mode === "REVEAL_USED"}
-            onChange={() => setMode("REVEAL_USED")}
-          />
-          <span className="mode-icon" aria-hidden="true">
-            ✦
-          </span>
-          <span>
-            <strong>Reveal-used</strong>
-            <small>Reveal played bonuses.</small>
-          </span>
-        </label>
-      </fieldset>
-      <details className="players-options">
-        <summary>
-          Who’s playing? <span>Player names (optional)</span>
-        </summary>{" "}
-        <div className="name-fields">
-          {names.map((n, i) => (
-            <label key={i}>
-              Player {i + 1}
-              <input
-                maxLength={32}
-                value={n}
-                onChange={(e) =>
-                  setNames(names.map((v, j) => (j === i ? e.target.value : v)))
-                }
-              />
-            </label>
-          ))}
+      <div className="setup-controls">
+        <div className="setup-heading">
+          <span className="eyebrow">THE TABLE IS YOURS</span>
+          <h3>A little friendly intrigue.</h3>
         </div>
-      </details>
-      {hasSave && newGameButton}
+        <div className="setup-start">
+          {hasSave && (
+            <button
+              className="primary full"
+              onClick={() => void controller.resume()}
+              disabled={busy}
+            >
+              Resume game
+            </button>
+          )}
+          {!hasSave && newGameButton}
+        </div>
+        <fieldset>
+          <legend>Pick your mode</legend>
+          <label
+            className={`mode-choice ${mode === "SCORE_ONLY" ? "chosen" : ""}`}
+          >
+            <input
+              type="radio"
+              name="reveal"
+              checked={mode === "SCORE_ONLY"}
+              onChange={() => setMode("SCORE_ONLY")}
+            />
+            <span className="mode-icon" aria-hidden="true">
+              ?
+            </span>
+            <span>
+              <strong>Score-only</strong>
+              <small>Bonuses stay hidden.</small>
+            </span>
+          </label>
+          <label
+            className={`mode-choice ${mode === "REVEAL_USED" ? "chosen" : ""}`}
+          >
+            <input
+              type="radio"
+              name="reveal"
+              checked={mode === "REVEAL_USED"}
+              onChange={() => setMode("REVEAL_USED")}
+            />
+            <span className="mode-icon" aria-hidden="true">
+              ✦
+            </span>
+            <span>
+              <strong>Reveal-used</strong>
+              <small>Reveal played bonuses.</small>
+            </span>
+          </label>
+        </fieldset>
+        <div className="setup-links">
+          <button onClick={() => setOptions("players")}>Who’s playing?</button>
+          <button onClick={() => setOptions("help")}>
+            How to play & install
+          </button>
+          {hasSave && newGameButton}
+        </div>
+      </div>
+      {options === "players" && (
+        <Dialog title="Who’s playing?" onClose={() => setOptions(null)}>
+          <p>
+            Two players, one device. Add your names, or keep Player 1 and Player
+            2.
+          </p>
+          <div className="name-fields">
+            {names.map((n, i) => (
+              <label key={i}>
+                Player {i + 1}
+                <input
+                  maxLength={32}
+                  value={n}
+                  onChange={(e) =>
+                    setNames(
+                      names.map((v, j) => (j === i ? e.target.value : v)),
+                    )
+                  }
+                />
+              </label>
+            ))}
+          </div>
+          <button className="primary full" onClick={() => setOptions(null)}>
+            Done
+          </button>
+        </Dialog>
+      )}
       {DEV_TOOLS && (
         <details className="dev">
           <summary>Developer fixtures</summary>
@@ -265,29 +306,31 @@ function Setup({ hasSave, busy }: { hasSave: boolean; busy: boolean }) {
           </label>
         </details>
       )}
-      <details className="how-to">
-        <summary>How to play & install</summary>
-        <p>
-          Start with a word crossing H8, the ordinary center. Tap a starting
-          square, then tap your rack letters, or drag letters onto the board.
-          Drag staged tiles to move them or return them to your rack. The cursor
-          advances across or down. All new tiles must form a connected row or
-          column. Submit to learn your turn total. Bonuses work once, on new
-          tiles only; seven tiles earn 50 extra.
-        </p>
-        <p>
-          Notes are your private guesses. Opposite squares match under a
-          half-turn: A1 ↔ O15. Scores may allow several explanations. After each
-          turn, use the score and revealed squares to keep making private notes.
-          Tap another square to keep going; only Pass device ends your access.
-        </p>
-        <p>
-          After this page has loaded and the offline cache is ready, the game
-          works without a connection. In Safari, Share → Add to Home Screen
-          installs it. Pending tiles are not saved. Resume always asks who is
-          holding the device.
-        </p>
-      </details>
+      {options === "help" && (
+        <Dialog title="How to play & install" onClose={() => setOptions(null)}>
+          <p>
+            Start with a word crossing H8, the ordinary center. Tap a starting
+            square, then tap your rack letters, or drag letters onto the board.
+            Drag staged tiles to move them or return them to your rack. The
+            cursor advances across or down. All new tiles must form a connected
+            row or column. Submit to learn your turn total. Bonuses work once,
+            on new tiles only; seven tiles earn 50 extra.
+          </p>
+          <p>
+            Notes are your private guesses. Opposite squares match under a
+            half-turn: A1 ↔ O15. Scores may allow several explanations. After
+            each turn, use the score and revealed squares to keep making private
+            notes. Tap another square to keep going; only Pass device ends your
+            access.
+          </p>
+          <p>
+            After this page has loaded and the offline cache is ready, the game
+            works without a connection. In Safari, Share → Add to Home Screen
+            installs it. Pending tiles are not saved. Resume always asks who is
+            holding the device.
+          </p>
+        </Dialog>
+      )}
       {confirm && (
         <Dialog title="Replace saved game?" onClose={() => setConfirm(false)}>
           <p>A new game will replace the game saved on this device.</p>
@@ -323,7 +366,7 @@ function GameScreen({
   const [historyTurn, setHistoryTurn] = useState<number | undefined>();
   const [compare, setCompare] = useState<Player | undefined>();
   const [sheet, setSheet] = useState<
-    "inspect" | "blank" | "pass" | "exchange" | "new" | null
+    "inspect" | "blank" | "pass" | "exchange" | "new" | "more" | null
   >(null);
   const [blankAt, setBlankAt] = useState<number | null>(null);
   const [exchange, setExchange] = useState<string[] | null>(null);
@@ -448,6 +491,7 @@ function GameScreen({
     enabled:
       active &&
       !notesMode &&
+      !history &&
       historyTurn === undefined &&
       exchange === null &&
       sheet === null &&
@@ -529,7 +573,10 @@ function GameScreen({
       </section>
     );
   return (
-    <>
+    <section
+      className={`game-table phase-${view.phase.toLowerCase()} ${notesMode && canNote && historyTurn === undefined ? "is-noting" : ""}`}
+      aria-label="Game table"
+    >
       <section className="score-strip" aria-label="Scores">
         {view.names.map((name, i) => (
           <div
@@ -659,34 +706,56 @@ function GameScreen({
             Notes
           </button>
         </div>
-        <button onClick={() => setHistory((v) => !v)} aria-expanded={history}>
-          History <span>{view.history.length}</span>
+        <button
+          className="history-trigger"
+          onClick={() => setHistory((v) => !v)}
+          aria-expanded={history}
+        >
+          <span className="history-icon" aria-hidden="true">
+            ◷
+          </span>
+          <span className="history-label">History</span>{" "}
+          <span>{view.history.length}</span>
+        </button>
+        <button className="more-trigger" onClick={() => setSheet("more")}>
+          More
+        </button>
+        <button
+          className="mobile-zoom"
+          aria-pressed={boardZoom.enlarged}
+          onClick={() =>
+            setBoardZoom({ enlarged: !boardZoom.enlarged, center: null })
+          }
+        >
+          {boardZoom.enlarged ? "Fit board" : "Enlarge ⤢"}
         </button>
       </nav>
       {history && (
-        <section className="history panel">
-          <h2>Move history</h2>
-          {!view.history.length && <p>No committed turns yet.</p>}
-          {view.history.map((m) => (
-            <button
-              key={m.turn}
-              className={historyTurn === m.turn ? "selected-history" : ""}
-              onClick={() => {
-                setHistoryTurn(m.turn);
-                setSelectedCell(null);
-                setSheet(null);
-              }}
-            >
-              #{m.turn} {view.names[m.player]} ·{" "}
-              {m.type === "PLAY"
-                ? m.words.join(", ")
-                : m.type === "PASS"
-                  ? "Pass"
-                  : `Exchange ${m.exchanged}`}{" "}
-              <strong>{m.total} pts</strong>
-            </button>
-          ))}
-        </section>
+        <Dialog title="Move history" onClose={() => setHistory(false)}>
+          <section className="history">
+            {!view.history.length && <p>No committed turns yet.</p>}
+            {view.history.map((m) => (
+              <button
+                key={m.turn}
+                className={historyTurn === m.turn ? "selected-history" : ""}
+                onClick={() => {
+                  setHistoryTurn(m.turn);
+                  setSelectedCell(null);
+                  setSheet(null);
+                  setHistory(false);
+                }}
+              >
+                #{m.turn} {view.names[m.player]} ·{" "}
+                {m.type === "PLAY"
+                  ? m.words.join(", ")
+                  : m.type === "PASS"
+                    ? "Pass"
+                    : `Exchange ${m.exchanged}`}{" "}
+                <strong>{m.total} pts</strong>
+              </button>
+            ))}
+          </section>
+        </Dialog>
       )}
       {historyTurn !== undefined && (
         <div className="history-banner">
@@ -934,7 +1003,24 @@ function GameScreen({
                   Recall
                 </button>
               </div>
-              <div className="secondary-actions">
+            </>
+          )}
+        </section>
+      )}
+      {view.phase === "OVER" && (
+        <div className="legend">
+          Ordinary — · DL 2× letter · TL 3× letter · DW 2× word · TW 3× word
+        </div>
+      )}
+      {sheet === "more" && (
+        <Dialog title="Game menu" onClose={closeSheet}>
+          <p>
+            Turn {view.turn} · {view.bagCount} tiles in bag ·{" "}
+            {view.mode === "SCORE_ONLY" ? "Score-only" : "Reveal-used"}
+          </p>
+          <div className="game-menu-actions">
+            {active && historyTurn === undefined && (
+              <>
                 <button
                   disabled={busy || pending.length > 0}
                   onClick={() => setSheet("pass")}
@@ -946,30 +1032,31 @@ function GameScreen({
                   onClick={() => {
                     setExchange([]);
                     setSelected(null);
+                    closeSheet();
+                    setNotesMode(false);
+                    setHistoryTurn(undefined);
                   }}
                 >
                   Exchange
                 </button>
-              </div>
-              {pending.length > 0 && (
-                <small>
-                  Recall staged tiles before passing or exchanging. Tap a staged
-                  tile, then its destination to move it. Undo reverses your last
-                  change.
-                </small>
-              )}
-            </>
+              </>
+            )}
+            <button onClick={() => setSheet("new")}>Home / New game</button>
+          </div>
+          <p>
+            Drag or tap to place tiles. Tap a staged tile to move it or remove
+            it. Undo reverses your last change; Recall returns the whole pending
+            word.
+          </p>
+          {pending.length > 0 && (
+            <p>Recall staged tiles before passing or exchanging.</p>
           )}
-        </section>
+          <p>
+            Use Notes to mark private guesses. You can keep making notes after
+            submitting, until you pass the device.
+          </p>
+        </Dialog>
       )}
-      {view.phase === "OVER" && (
-        <div className="legend">
-          Ordinary — · DL 2× letter · TL 3× letter · DW 2× word · TW 3× word
-        </div>
-      )}
-      <button className="text-button" onClick={() => setSheet("new")}>
-        Home / New game
-      </button>
       {sheet === "inspect" && selectedCell !== null && (
         <Dialog
           title={`${coord(selectedCell)} ↔ ${coord(mirror(selectedCell))}`}
@@ -1081,6 +1168,6 @@ function GameScreen({
         </Dialog>
       )}
       {active && !notesMode && historyTurn === undefined && drag.overlay}
-    </>
+    </section>
   );
 }

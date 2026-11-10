@@ -189,6 +189,19 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
             expectedBuild,
           );
         }
+        const fitsWindow = async () => {
+          assert.ok(
+            await page.evaluate(
+              () =>
+                globalThis.document.documentElement.scrollHeight <=
+                  globalThis.innerHeight + 1 &&
+                globalThis.document.documentElement.scrollWidth <=
+                  globalThis.innerWidth + 1,
+            ),
+            "The home screen and primary game controls should fit the window",
+          );
+        };
+        await fitsWindow();
         await page.screenshot({
           path: `${directory}/${engine}-${variant.name}-home.png`,
           fullPage: true,
@@ -249,6 +262,7 @@ for (const engine of (process.env.SMOKE_BROWSERS || "chromium,firefox").split(
           await page.getByTestId("cell-113").getAttribute("aria-label"),
           /letter /,
         );
+        await fitsWindow();
         const origin = new URL(page.url()).origin;
         assert.deepEqual(pageErrors, []);
         assert.deepEqual(
